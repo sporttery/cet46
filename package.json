@@ -7,13 +7,15 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
     "debug": "electron . --inspect",
-    "winexe": "electron-builder --win --x64"
+    "winexe": "electron-builder --win  nsis:x64 ",
+    "package": "electron-packager ./ CET4 --platform=win32 --arch=x64 --icon=img/app-icon.png --out=./dist --app-version=1.0.1 --overwrite"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "electron": "^2.0.6",
-    "electron-builder": "^22.10.5"
+    "electron-builder": "^22.10.5",
+    "electron-packager": "^13.1.1"
   },
   "build": {
     "appId": "com.huanbo.cet46",

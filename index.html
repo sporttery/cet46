@@ -23,6 +23,9 @@
 			margin-right: 10px;
 			display: inline;
 		}
+		#fileData td{
+			vertical-align: middle;
+		}
 	</style>
 </head>
 
@@ -155,10 +158,12 @@
 									<option value=".txt">.txt</option>
 									<option value="*">所有文件</option>
 								</select>
-								<span class="input-group-addon" id="basic-addon3">考试日期</span>
-								<input type="text" maxlength="20" class="form-control" aria-describedby="basic-addon3" id="ks_date"  />
+								<span class="input-group-addon" id="basic-addon3">考试年份</span>
+								<!-- <input type="text" maxlength="20" class="form-control" aria-describedby="basic-addon3" id="ks_date"  /> -->
+								<select class="form-control" aria-describedby="basic-addon3" id="ks_date" ></select>
 								<span class="input-group-addon" id="basic-addon4">考试类型</span>
-								<input type="text" maxlength="20" class="form-control" aria-describedby="basic-addon4" id="ks_type" value="CET4"  />
+								<!-- <input type="text" maxlength="20" class="form-control" aria-describedby="basic-addon4" id="ks_type" value="CET4"  /> -->
+								<select class="form-control" aria-describedby="basic-addon4" id="ks_type" ></select>
 							</div>
 						</div>
 					</div>
@@ -215,8 +220,39 @@
 	
 	<script src="index.js"></script>
 	<script>
+		function loadTableData(){
+			tableData=[].concat(defaultTableData);
+			setTableData();
+			if(!checkFolder()){//目录检查没有通过
+				$(".nav a")[0].click();
+			}else if(tableData.length ==0){//数据定义没有通过
+				$(".nav a")[2].click();
+			}else { //如果数据定义已经Ok，开启查找文件功能
+				$(".nav a")[parseInt(defaultNavTab)].click();
+				$("#btnFindFile").removeAttr("disabled").removeClass("disabled");
+				g_data_changed=-1;
+			}
+		}
 		$(() => {
-			loadDefaultConfig && loadDefaultConfig();
+			var date = new Date();
+			var year = date.getFullYear();
+			var options=[];
+			for(var i=0;i<=20;i++){
+				options.push('<option value="'+(year-i)+'">'+(year-i)+'年</option>');
+			}
+			$("#ks_date").html(options.join("")).on("change",()=>{
+				loadDefaultConfig();
+				loadTableData();
+			});
+			var options=[];
+			for(var type in allowFileName){
+				options.push('<option value="'+type+'">'+type+'</option>');
+			}
+			$("#ks_type").html(options.join("")).on("change",()=>{
+				loadDefaultConfig();
+				loadTableData();
+			});
+			loadDefaultConfig();
 			$("#profile .input-group").each((idx, el) => {
 				var group = $(el);
 				folderEleArr[idx] = group.find("input:eq(0)");
@@ -234,21 +270,7 @@
 					folderArr[idx] = '';
 				});
 			});
-			tableData=[].concat(defaultTableData);
-			setTableData();
-			if(!checkFolder()){//目录检查没有通过
-				$(".nav a")[0].click();
-			}else if(tableData.length ==0){//数据定义没有通过
-				$(".nav a")[2].click();
-			}else { //如果数据定义已经Ok，开启查找文件功能
-				$(".nav a")[parseInt(defaultNavTab)].click();
-				$("#btnFindFile").removeAttr("disabled").removeClass("disabled");
-				g_data_changed=-1;
-			}
-			var date = new Date();
-			var month = (date.getMonth()+1);
-			
-			$("#ks_date").val(date.getFullYear()+"年"+(month>9?month:"0"+month)+"月");
+			loadTableData();
 		})
 	</script>
 </body>
