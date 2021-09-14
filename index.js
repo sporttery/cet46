@@ -479,13 +479,21 @@ var checkDataFun = {
             err.push("语言级别代码不一致");
         }
         if (picIndex != -1) {
-            if (!fs.existsSync(path.join(folderArr[1], sf, _xxdm, _xqdm, _yyjb, currData["照片"]))) {
-                err.push("照片不存在[" + currData["照片"] + "]");
+            if (fs.existsSync(path.join(folderArr[1], sf, _xxdm, _xqdm, _yyjb, currData["照片"]+".jpg"))) {
+                currData["照片"] = currData["照片"]+".jpg";
+            }else if(fs.existsSync(path.join(folderArr[1], sf, _xxdm, _xqdm, _yyjb, currData["照片"]+".png"))){
+                currData["照片"] = currData["照片"]+".png";
+            }else{
+                err.push("照片不存在 [" + currData["照片"] + "]");
             }
         }
         if (qrcodeIndex != -1) {
-            if (!fs.existsSync(path.join(folderArr[1], sf, _xxdm, _xqdm, _yyjb, currData["二维码"]))) {
-                err.push("二维码不存在[" + currData["二维码"] + "]");
+            if (fs.existsSync(path.join(folderArr[2], sf, _xxdm, _xqdm, _yyjb, currData["二维码"]+".jpg"))) {
+                currData["二维码"] = currData["二维码"]+".jpg";
+            }else if(fs.existsSync(path.join(folderArr[2], sf, _xxdm, _xqdm, _yyjb, currData["二维码"]+".png"))){
+                currData["二维码"] = currData["二维码"]+".png";
+            }else{
+                err.push("二维码不存在 [" + currData["二维码"] + "]");
             }
         }
         if (err.length > 0) {
@@ -536,19 +544,18 @@ function analyticHandle(file, inputEl) {
     let totalSize = file.size;
 
     let tds = $(inputEl).parent().siblings();
+    $(tds[tds.length-1]).text("准备中");
     //单个文件里所有的数据， 数据内容：{学院1:[],学院2:[]}
     let allDataInFile = {};
-    //单个文件里所有合格的数据生成的串，可以直接输出到ok.txt文件里
+    //单个文件里所有合格的数据生成的串，可以直接输出到ok.csv文件里
     let allOkStrInFile = {};
-    let readObj = readline.createInterface({
-        input: fs.createReadStream(file.filepath)
-    });
+    
     let filename = path.basename(file.filepath);
     let ext = path.extname(file.filepath);
     //合格数据文件
-    let okFilepath = path.join(folderArr[3], ext == "" ? filename + ".ok.txt" : filename.replace(ext, ".ok.txt"));
+    let okFilepath = path.join(folderArr[3], ext == "" ? filename + ".ok.csv" : filename.replace(ext, ".ok.csv"));
     //错误数据文件
-    let errFilepath = path.join(folderArr[4], path.basename(okFilepath).replace(".ok.txt", ".err.txt"));
+    let errFilepath = path.join(folderArr[4], path.basename(okFilepath).replace(".ok.csv", ".err.csv"));
     //省份代码
     let sf = filename.split(/[_.]/g)[1];
     let lang = filename.substring(0, 4);
@@ -556,16 +563,30 @@ function analyticHandle(file, inputEl) {
     if (!validFun) {
         validFun = checkDataFun["DEFAULT"];
     }
+
     if (fs.existsSync(okFilepath)) {
-        fs.unlinkSync(okFilepath);
+        try {
+            fs.unlinkSync(okFilepath);
+        } catch (error) {
+            $(tds[tds.length-1]).text(okFilepath+"文件已经存在，删除原文件失败，如果用excel打开了此文件，请先关闭再试");
+            progressData.len--;
+            return;
+        }
     }
     if (fs.existsSync(errFilepath)) {
-        fs.unlinkSync(errFilepath);
+        try {
+            fs.unlinkSync(errFilepath);
+        } catch (error) {
+            $(tds[tds.length-1]).text(errFilepath+" 文件已经存在，删除原文件失败，如果用excel打开了此文件，请先关闭再试");
+            progressData.len--;
+            return;
+        }
     }
     let sumlen = 0;
     let lineCount = 0;
     let lastProgress = "";
     let errCount = 0;
+    let head = [];//表头
     if (!enabledColumns) {
         enabledColumns = {};
         EMPTY = "";
@@ -582,6 +603,7 @@ function analyticHandle(file, inputEl) {
                 enabledColumns["_" + i] = parseInt(config["排序号"]);
                 EMPTY += "0,";
                 EMPTYOBJ[config["内容"]] = "0";
+                head[parseInt(config["排序号"])] = config["内容"];
             }
         }
         if (picIndex != -1) {
@@ -596,7 +618,20 @@ function analyticHandle(file, inputEl) {
             EMPTY = EMPTY.substring(0, EMPTY.length - 1);
         }
     }
-
+    let headLine=[];
+    for(var i=0;i<head.length;i++){
+        if(head[i]){
+            headLine.push(head[i]);
+        }
+    }
+    headLine.push("照片");
+    headLine.push("二维码");
+    let headLineStr = "\""+headLine.join("\",\"")+"\"\r\n";
+    fs.appendFileSync(okFilepath, iconv.encode(headLineStr,  'gbk'), "binary");
+    $(tds[tds.length-1]).text("进行中");
+    let readObj = readline.createInterface({
+        input: fs.createReadStream(file.filepath)
+    });
     // 一行一行地读取文件
     readObj.on('line', function (line) {
         if (errCount == -1) {
@@ -637,18 +672,18 @@ function analyticHandle(file, inputEl) {
                 readObj.close();
                 return false;
             }
-            let outputData = [];
-            let currData = {};
+            let outputData = []; //按排序号的排序的内容
+            let currData = {};//全部内容
             for (let i = 0; i < columns.length; i++) {
                 let sortNum = enabledColumns["_" + i];
                 currData[tableData[i]["内容"]] = columns[i];
                 if (sortNum) {
                     outputData[sortNum] = columns[i];
                     if (picIndex == i) {
-                        currData["照片"] = columns[i] + ".jpg";
+                        currData["照片"] = columns[i]  ;
                     }
                     if (qrcodeIndex == i) {
-                        currData["二维码"] = columns[i] + ".jpg";
+                        currData["二维码"] = columns[i]  ;
                     }
                 }
             }
@@ -657,26 +692,27 @@ function analyticHandle(file, inputEl) {
                 outputData[tableData.length + 1] = currData["照片"];
                 outputData[tableData.length + 2] = currData["二维码"];
             }else{
-                console.log(" 第" + lineCount + "行 报错" + errMsg + " -> " + line);
+                // console.log(" 第" + lineCount + "行 报错" + errMsg + " -> " + line);
             }
 
             let finalData = [];
             for (let i = 0; i < outputData.length; i++) {
-                if (outputData[i]) {
+                if (typeof outputData[i] != "undefined") {
                     finalData.push(outputData[i]);
                 }
             }
+            var csvLineStr = "\""+finalData.join("\",\"") + "\"";
             if (errMsg != "") {
                 errCount++;
                 finalData.push(errMsg);
-                fs.appendFileSync(errFilepath, finalData.join("\t") + "\r\n")
+                fs.appendFileSync(errFilepath, csvLineStr+ "\r\n")
             } else {
                 //ks_ssxx 学校代码
                 //dm_mc 学校名称
                 if (!allOkStrInFile[currData["ks_ssxx"]]) {
                     allOkStrInFile[currData["ks_ssxx"]] = [];
                 }
-                allOkStrInFile[currData["ks_ssxx"]].push(finalData.join(","));
+                allOkStrInFile[currData["ks_ssxx"]].push(csvLineStr);
             }
             if (!allDataInFile[currData["ks_ssxx"]]) {
                 allDataInFile[currData["ks_ssxx"]] = [];
@@ -690,7 +726,7 @@ function analyticHandle(file, inputEl) {
             return;
         }
         //同步
-        let pakFilepath = okFilepath.replace(".ok.txt", ".pak.txt");
+        let pakFilepath = okFilepath.replace(".ok.csv", ".pak.txt");
         if (fs.existsSync(pakFilepath)) {
             fs.unlinkSync(pakFilepath);
         }
@@ -843,7 +879,7 @@ function analyticHandle(file, inputEl) {
             html.push('</table>合计：' + table.size);
             html.push(tFooter);
         });
-        let xxtjpath = okFilepath.replace(".ok.txt", ".学校统计.html");
+        let xxtjpath = okFilepath.replace(".ok.csv", ".学校统计.html");
         fs.writeFileSync(xxtjpath, templateHtml.replace("###content###", html.join("")));
         html = null;
 
@@ -910,6 +946,14 @@ function doit(obj) {
                 analyticHandle(file, input);
             }
         });
+        setTimeout(()=>{
+            if (progressData.len <= 0) {
+                setProgressbar(100);
+                $("#btnData").removeAttr("disabled", "disabled").removeClass("disabled");
+                layer.close(layerLoadIdx); 
+                alert("所有数据已处理完成", "消息");
+            }
+        },1000*10);
 
     }, 500);
 }
