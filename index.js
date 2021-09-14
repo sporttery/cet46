@@ -228,7 +228,7 @@ function save(flag) {
             delete enabledColumns;//清除缓存
             var ks_type = $("#ks_type").val();
             var ks_date = $("#ks_date").val();
-            var tableKey = "tableData_"+ks_date+"_"+ks_type;
+            var tableKey = "tableData_" + ks_date + "_" + ks_type;
             configuration.saveSettings(tableKey, JSON.stringify(tableData))
             defaultTableData = [].concat(tableData);
             if (checkFolder(true)) { //如果目录设置已经Ok，开启查找文件功能
@@ -242,18 +242,18 @@ function save(flag) {
 function loadDefaultConfig() {
     var ks_type = $("#ks_type").val();
     var ks_date = $("#ks_date").val();
-    var tableKey = "tableData_"+ks_date+"_"+ks_type;
+    var tableKey = "tableData_" + ks_date + "_" + ks_type;
     var folderArr = configuration.readSettings("folderArr");
     if (folderArr) {
         defaultFolderArr = JSON.parse(folderArr);
-    }else{
-        defaultFolderArr=[];
+    } else {
+        defaultFolderArr = [];
     }
     var tableData = configuration.readSettings(tableKey);
     if (tableData) {
         defaultTableData = JSON.parse(tableData);
-    }else{
-        defaultTableData=[];
+    } else {
+        defaultTableData = [];
     }
     defaultNavTab = configuration.readSettings("defaultNavTab") || 0;
 }
@@ -277,9 +277,9 @@ function selectAll(obj, id) {
 // 法语四级	CFT4.CSV
 
 const allowFileName = {
-    CET4:1,CET6:1,CJT4:1,CJT6:1,CGT4:1,CGT6:1,CRT4:1,CRT6:1,CFT4:1,CFT6:1
+    CET4: 1, CET6: 1, CJT4: 1, CJT6: 1, CGT4: 1, CGT6: 1, CRT4: 1, CRT6: 1, CFT4: 1, CFT6: 1
 };
-const allowFileNameReg=new RegExp("^("+Object.keys(allowFileName).join("|")+")_\\d+\\..*$");
+const allowFileNameReg = new RegExp("^(" + Object.keys(allowFileName).join("|") + ")_\\d+\\..*$");
 function getFiles(sourceDir, includeSubFolder, filetypes) {
     let allfiles = [];
     function findFiles(dir, includeSubFolder, filetypes) {
@@ -292,15 +292,15 @@ function getFiles(sourceDir, includeSubFolder, filetypes) {
             }
             if (stat.isFile() === true) {
                 var extname = path.extname(fPath);
-                var basename =  path.basename(fPath);
+                var basename = path.basename(fPath);
                 if (typeof filetypes == "string") {//filetypes 是字符串
                     if (filetypes === "*" || extname == filetypes) {
-                        if(allowFileNameReg.test(basename)){
+                        if (allowFileNameReg.test(basename)) {
                             allfiles.push({ filepath: fPath, size: stat.size });
                         }
                     }
                 } else if (typeof filetypes == "object" && filetypes.includes && filetypes.includes(extname)) {//filetypes 是数组
-                    if(allowFileNameReg.test(basename)){
+                    if (allowFileNameReg.test(basename)) {
                         allfiles.push({ filepath: fPath, size: stat.size });
                     }
                 };
@@ -361,7 +361,7 @@ function findFile(obj) {
     var includeSubFolder = $("#includeSubFolder")[0].checked;
     var filetype = $("#filetype").val();
     allDataFiles = getFiles(folderArr[0], includeSubFolder, filetype);
-    
+
     //fileData
     var html = [];
     allDataFiles.forEach((file, idx) => {
@@ -479,21 +479,23 @@ var checkDataFun = {
             err.push("语言级别代码不一致");
         }
         if (picIndex != -1) {
-            if (fs.existsSync(path.join(folderArr[1], sf, _xxdm, _xqdm, _yyjb, currData["照片"]+".jpg"))) {
-                currData["照片"] = currData["照片"]+".jpg";
-            }else if(fs.existsSync(path.join(folderArr[1], sf, _xxdm, _xqdm, _yyjb, currData["照片"]+".png"))){
-                currData["照片"] = currData["照片"]+".png";
-            }else{
-                err.push("照片不存在 [" + currData["照片"] + "]");
+            picFolder=path.join(folderArr[1], sf, _xxdm, _xqdm, _yyjb);
+            if (fs.existsSync(path.join(picFolder, currData["照片"] + ".jpg"))) {
+                currData["照片"] = currData["照片"] + ".jpg";
+            } else if (fs.existsSync(path.join(picFolder, currData["照片"] + ".png"))) {
+                currData["照片"] = currData["照片"] + ".png";
+            } else {
+                err.push("照片不存在 [" + picFolder +"\\"+ currData["照片"] + "]");
             }
         }
         if (qrcodeIndex != -1) {
-            if (fs.existsSync(path.join(folderArr[2], sf, _xxdm, _xqdm, _yyjb, currData["二维码"]+".jpg"))) {
-                currData["二维码"] = currData["二维码"]+".jpg";
-            }else if(fs.existsSync(path.join(folderArr[2], sf, _xxdm, _xqdm, _yyjb, currData["二维码"]+".png"))){
-                currData["二维码"] = currData["二维码"]+".png";
-            }else{
-                err.push("二维码不存在 [" + currData["二维码"] + "]");
+            picFolder=path.join(folderArr[2], sf, _xxdm, _xqdm, _yyjb);
+            if (fs.existsSync(path.join(picFolder, currData["二维码"] + ".jpg"))) {
+                currData["二维码"] = currData["二维码"] + ".jpg";
+            } else if (fs.existsSync(path.join(picFolder, currData["二维码"] + ".png"))) {
+                currData["二维码"] = currData["二维码"] + ".png";
+            } else {
+                err.push("二维码不存在 [" +picFolder +"\\"+ currData["二维码"] + "]");
             }
         }
         if (err.length > 0) {
@@ -544,12 +546,12 @@ function analyticHandle(file, inputEl) {
     let totalSize = file.size;
 
     let tds = $(inputEl).parent().siblings();
-    $(tds[tds.length-1]).text("准备中");
+    $(tds[tds.length - 1]).text("准备中");
     //单个文件里所有的数据， 数据内容：{学院1:[],学院2:[]}
     let allDataInFile = {};
     //单个文件里所有合格的数据生成的串，可以直接输出到ok.csv文件里
     let allOkStrInFile = {};
-    
+
     let filename = path.basename(file.filepath);
     let ext = path.extname(file.filepath);
     //合格数据文件
@@ -568,7 +570,7 @@ function analyticHandle(file, inputEl) {
         try {
             fs.unlinkSync(okFilepath);
         } catch (error) {
-            $(tds[tds.length-1]).text(okFilepath+"文件已经存在，删除原文件失败，如果用excel打开了此文件，请先关闭再试");
+            $(tds[tds.length - 1]).text(okFilepath + "文件已经存在，删除原文件失败，如果用excel打开了此文件，请先关闭再试");
             progressData.len--;
             return;
         }
@@ -577,7 +579,7 @@ function analyticHandle(file, inputEl) {
         try {
             fs.unlinkSync(errFilepath);
         } catch (error) {
-            $(tds[tds.length-1]).text(errFilepath+" 文件已经存在，删除原文件失败，如果用excel打开了此文件，请先关闭再试");
+            $(tds[tds.length - 1]).text(errFilepath + " 文件已经存在，删除原文件失败，如果用excel打开了此文件，请先关闭再试");
             progressData.len--;
             return;
         }
@@ -618,17 +620,17 @@ function analyticHandle(file, inputEl) {
             EMPTY = EMPTY.substring(0, EMPTY.length - 1);
         }
     }
-    let headLine=[];
-    for(var i=0;i<head.length;i++){
-        if(head[i]){
+    let headLine = [];
+    for (var i = 0; i < head.length; i++) {
+        if (head[i]) {
             headLine.push(head[i]);
         }
     }
     headLine.push("照片");
     headLine.push("二维码");
-    let headLineStr = "\""+headLine.join("\",\"")+"\"\r\n";
-    fs.appendFileSync(okFilepath, iconv.encode(headLineStr,  'gbk'), "binary");
-    $(tds[tds.length-1]).text("进行中");
+    let headLineStr = "\"" + headLine.join("\",\"") + "\"\r\n";
+    fs.appendFileSync(okFilepath, iconv.encode(headLineStr, 'gbk'), "binary");
+    $(tds[tds.length - 1]).text("进行中");
     let readObj = readline.createInterface({
         input: fs.createReadStream(file.filepath)
     });
@@ -680,10 +682,10 @@ function analyticHandle(file, inputEl) {
                 if (sortNum) {
                     outputData[sortNum] = columns[i];
                     if (picIndex == i) {
-                        currData["照片"] = columns[i]  ;
+                        currData["照片"] = columns[i];
                     }
                     if (qrcodeIndex == i) {
-                        currData["二维码"] = columns[i]  ;
+                        currData["二维码"] = columns[i];
                     }
                 }
             }
@@ -691,7 +693,7 @@ function analyticHandle(file, inputEl) {
             if (errMsg == "") {
                 outputData[tableData.length + 1] = currData["照片"];
                 outputData[tableData.length + 2] = currData["二维码"];
-            }else{
+            } else {
                 // console.log(" 第" + lineCount + "行 报错" + errMsg + " -> " + line);
             }
 
@@ -701,11 +703,11 @@ function analyticHandle(file, inputEl) {
                     finalData.push(outputData[i]);
                 }
             }
-            var csvLineStr = "\""+finalData.join("\",\"") + "\"";
+            var csvLineStr = "\"" + finalData.join("\",\"") + "\"";
             if (errMsg != "") {
                 errCount++;
-                finalData.push(errMsg);
-                fs.appendFileSync(errFilepath, csvLineStr+ "\r\n")
+                csvLineStr = csvLineStr + ",\"" + errMsg + "\"";
+                fs.appendFileSync(errFilepath, csvLineStr + "\r\n")
             } else {
                 //ks_ssxx 学校代码
                 //dm_mc 学校名称
@@ -946,14 +948,14 @@ function doit(obj) {
                 analyticHandle(file, input);
             }
         });
-        setTimeout(()=>{
+        setTimeout(() => {
             if (progressData.len <= 0) {
                 setProgressbar(100);
                 $("#btnData").removeAttr("disabled", "disabled").removeClass("disabled");
-                layer.close(layerLoadIdx); 
+                layer.close(layerLoadIdx);
                 alert("所有数据已处理完成", "消息");
             }
-        },1000*10);
+        }, 1000 * 10);
 
     }, 500);
 }
