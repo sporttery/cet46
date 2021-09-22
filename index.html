@@ -37,8 +37,8 @@
 					data-toggle="tab">系统设置</a>
 			</li>
 			<li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab" data-toggle="tab">数据处理</a></li>
-			<li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">数据定义</a>
-			</li>
+			<li role="presentation"><a href="#patch" aria-controls="patch" role="tab" data-toggle="tab">补号</a></li>
+			<li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">数据定义</a></li>
 		</ul>
 		<!-- Tab panes -->
 		<div class="tab-content">
@@ -131,11 +131,53 @@
 						<input type="radio" name="chk_pic" id="chk_pic_no" value="-1" onchange="picChange()"><label for="chk_pic_no">不检测照片</label>
 						<input type="radio" name="chk_qrcode" id="chk_qrcode_no" value="-1" onchange="qrcodeChange()"><label for="chk_qrcode_no">不检测二维码</label>
 					</p>
+					<p>
+						<input type="checkbox" name="chk_tlmk" id="chk_tlmk" value="1" ><label for="chk_tlmk">判断听力障碍标准</label>
+						<br>
+						<span style="font-size: small;color: red;">判断"Ks_tlmk",当为"0"的时候输出" "，当为"1"的时候输出"该考生为听力残疾，听力部分免考，分数经折算计入笔试总分。"</span>
+					</p>
 				</div>
 				<div class="view" style="text-align: right;margin-top:20px;">
 					<button class="btn btn-success" onclick="save(true)">保存</button>
 					<button class="btn btn-default" onclick="restore(true)">取消</button>
 					<button class="btn btn-link" onclick="nextStep(1)">下一步</button>
+				</div>
+			</div>
+
+			<div role="tabpanel" class="tab-pane " id="patch">
+				<input type="file"  class="hide" id="patchFile" />
+				
+				<div class="view">
+					<br />
+					<div class="input-group">
+						<span class="input-group-addon" style="cursor: pointer;" onclick="openFile($(this).next().val())" title="点击打开文件"> 数据文件 .ok </span>
+						<input type="text" class="form-control" placeholder="选择OK数据文件..." />
+						<span class="input-group-btn">
+							<input class="btn btn-default" type="button" value="x" title="清除" onclick="$('#patchFile').val('')" />
+							<input class="btn btn-default" type="button" value="..." onclick="$('#patchFile').click()" />
+						</span>
+					</div>
+				</div>
+				<div class="view">
+					<p></p>
+					<p>直接在下面输入证书编号,用逗号、分号、空格或换行分隔开。生成的数据将按下列格式顺序排列: 			 </p>		
+					<p>[格式1]直接输入单个号码,如:081211002000001,081211002000003,081211002000007 </p>
+					<p>[格式2]用"+"输入增量号码,如:0812110000001+500+4,表示从081211002000001开始,号码递增500印4张 </p>
+					<p>[格式3]用"连接两个号码可以输入号码段,如:081211002000010(包含)-081211002000100(包含)</p>
+				</div>
+				<div class="view">
+					<form role="form">
+						<!-- 单选 -->
+						<div class="form-group">
+							<textarea name="patchTxt" id="patchTxt" cols="30" rows="30"  class="form-control"></textarea>
+						</div>
+					</form>
+				</div>
+				<div class="view">
+					<div class="view" style="text-align: center; vertical-align: middle;">
+					拼数：<input type="number" id="pageSize" min="1" max="10" value="4" maxlength="1" width="4" readonly/>
+					<input type="button" value="生成补打文件" onclick="doPatch()"/>
+				</div>
 				</div>
 			</div>
 

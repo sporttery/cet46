@@ -312,6 +312,9 @@ function getFiles(sourceDir, includeSubFolder, filetypes) {
 }
 
 function openFile(idx) {
+    if(!idx){
+        return;
+    }
     var filepath;
     if (isNaN(idx)) {
         filepath = idx;
@@ -325,6 +328,9 @@ function openFile(idx) {
 }
 
 function openDir(idx) {
+    if(!idx){
+        return;
+    }
     var dir;
     if (isNaN(idx)) {
         dir = idx;
@@ -591,8 +597,8 @@ function analyticHandle(file, inputEl) {
     let head = [];//表头
     if (!enabledColumns) {
         enabledColumns = {};
-        EMPTY = "";
-        EMPTYOBJ = {};
+        EMPTY = "0,";
+        EMPTYOBJ = {"PageNo":"0"};
         for (let i = 0; i < tableData.length; i++) {
             let config = tableData[i];
             if (config["启用"]) {
@@ -620,7 +626,7 @@ function analyticHandle(file, inputEl) {
             EMPTY = EMPTY.substring(0, EMPTY.length - 1);
         }
     }
-    let headLine = [];
+    let headLine = ["PageNo"];
     for (var i = 0; i < head.length; i++) {
         if (head[i]) {
             headLine.push(head[i]);
@@ -628,6 +634,12 @@ function analyticHandle(file, inputEl) {
     }
     headLine.push("照片");
     headLine.push("二维码");
+
+    if(chk_tlmk){
+        headLine.push("chk_tlmk");
+        EMPTYOBJ["chk_tlmk"]="0";
+        EMPTY+=",0";
+    }
     let headLineStr = "\"" + headLine.join("\",\"") + "\"\r\n";
     fs.appendFileSync(okFilepath, iconv.encode(headLineStr, 'gbk'), "binary");
     $(tds[tds.length - 1]).text("进行中");
@@ -678,7 +690,7 @@ function analyticHandle(file, inputEl) {
             let currData = {};//全部内容
             for (let i = 0; i < columns.length; i++) {
                 let sortNum = enabledColumns["_" + i];
-                currData[tableData[i]["内容"]] = columns[i];
+                currData[tableData[i]["内容"]] = columns[i].replace(".00","");
                 if (sortNum) {
                     outputData[sortNum] = columns[i];
                     if (picIndex == i) {
@@ -693,6 +705,13 @@ function analyticHandle(file, inputEl) {
             if (errMsg == "") {
                 outputData[tableData.length + 1] = currData["照片"];
                 outputData[tableData.length + 2] = currData["二维码"];
+                if(chk_tlmk){
+                    if(currDatap["ks_tlmk"]=="0"){
+                        outputData[tableData.length + 3] = " ";
+                    }else if(currDatap["ks_tlmk"]=="1"){
+                        outputData[tableData.length + 3] = "该考生为听力残疾，听力部分免考，分数经折算计入笔试总分。";
+                    }
+                }
             } else {
                 // console.log(" 第" + lineCount + "行 报错" + errMsg + " -> " + line);
             }
@@ -742,8 +761,8 @@ function analyticHandle(file, inputEl) {
             //打印矩阵数据，每4个一组
             let tmpArr = [[], [], [], []];
             let list = allOkStrInFile[key];
-            let size = Math.floor(list.length / 4);
-            let mod = list.length % 4;
+            let size = Math.floor(list.length / tmpArr.length);
+            let mod = list.length % tmpArr.length;
             let sizeArr = [size, size, size, size];
             for (let pakNo = 0; pakNo < mod; pakNo++) {
                 sizeArr[pakNo] += 1;
@@ -765,8 +784,9 @@ function analyticHandle(file, inputEl) {
 
             //输出到合格文件
             for (let k = 0; k < maxSize; k++) {
+                var pageNo = k+1;
                 for (let pakNo = 0; pakNo < 4; pakNo++) {
-                    fs.appendFileSync(okFilepath, iconv.encode(tmpArr[pakNo][k] + "\r\n", 'gbk'), "binary");
+                    fs.appendFileSync(okFilepath, iconv.encode("\""+pageNo+"\","+tmpArr[pakNo][k] + "\r\n", 'gbk'), "binary");
                 }
             }
         }
@@ -908,7 +928,7 @@ function analyticHandle(file, inputEl) {
         }
     });
 }
-var layerLoadIdx;
+var layerLoadIdx,chk_tlmk;
 function doit(obj) {
     if (tableData.length == 0) {
         alert("还没有进行数据定义，请先设置数据");
@@ -930,6 +950,7 @@ function doit(obj) {
     // 能到这里，说明已经配置过数据了，保存当前标签序号，下次直接到这个界面
     defaultNavTab = 1;
     configuration.saveSettings("defaultNavTab", defaultNavTab);
+    chk_tlmk = $("#chk_tlmk")[0].checked;
     setTimeout(() => {
         setProgressbar(0, "");
         progressData = { len: 0, size: 0, currSize: 0, lastProgress: 0 };
@@ -958,6 +979,95 @@ function doit(obj) {
         }, 1000 * 10);
 
     }, 500);
+}
+
+function doPatch(){
+    let patchFile = $("#patchFile").val();
+    if(patchFile==""){
+        alert("请先选择数据文件");
+        return;
+    }
+    let lines = $("#patchTxt").val().trim().split(/[\n]/g);
+    if(lines.length==0){
+        alert("请按照补号格式输入补号内容");
+        return;
+    }
+    let patchFileTxt = fs.readFileSync(patchFile).toString();
+    let patchFileLines = patchFileTxt.split("\r\n");
+    let okLines = [];
+    for(var i=0;i<lines.length;i++){
+        let line = lines[i].trim();
+        if(line.split("-")==2){
+            let start = line.split("-")[0];
+            let end = line.split("-")[1];
+            okLines.push(patchFileLines.filter(patchLine=>{
+                var zsh = patchLine.split(",")[1].replace(/["']/g,"").trim();
+                return zsh!="" && start <= zsh && end >= zsh;
+            }));
+        }else if(line.split("+")==3){
+            var arr = line.split("+");
+            var startIdx;
+            for(startIdx=1;startIdx<patchFileLines.length;startIdx++){
+                var patchLine = patchFileLines[startIdx];
+                var zsh = patchLine.split(",")[1].replace(/["']/g,"").trim();
+                if(arr[0] == zsh){
+                    break;
+                }
+            }
+            var count = parseInt(arr[2]);
+            var add = parseInt(arr[1]);
+            okLines.push(arr[0]);
+            var okIdx = add+startIdx;
+            for(var n=1;n<count;n++){
+                okLines.push(patchFileLines[okIdx]);
+                okIdx += add ;
+            }
+        }else {
+            var numArr = line.split(/,/g);
+            okLines.push(patchFileLines.filter(patchLine=>{
+                var zsh = patchLine.split(",")[1].replace(/["']/g,"").trim();
+                return zsh!="" && numArr.indexOf(zsh) !=-1;
+            }));
+        }
+    }
+    // okLines.unshift(patchFileLines[0]);
+    var filepath = patchFile.split(".ok")[0]+"-"+(+new Date)+".patch"+(patchFile.split(".ok")[1]||"");
+    fs.appendFileSync(filepath,iconv.encode(patchFileLines[0] + ("\r\n"), 'gbk'), "binary");
+
+
+
+    //打印矩阵数据，每4个一组
+    let tmpArr = [[], [], [], []];
+    let list = okLines;
+    let size = Math.floor(list.length / tmpArr.length);
+    let mod = list.length % tmpArr.length;
+    let sizeArr = [size, size, size, size];
+    for (let pakNo = 0; pakNo < mod; pakNo++) {
+        sizeArr[pakNo] += 1;
+    }
+    let idx = 0;
+    for (let pakNo = 0; pakNo < list.length; pakNo++) {
+        let data = list[pakNo];
+        tmpArr[idx].push(data);
+        if (tmpArr[idx].length == sizeArr[idx]) {//到了最大值，开始装下一个数组
+            idx = idx + 1;
+        }
+    }
+    if (mod != 0) {
+        for (let pakNo = mod; pakNo < 4; pakNo++) {
+            tmpArr[pakNo].push(EMPTY);
+        }
+    }
+    let maxSize = tmpArr[0].length;
+
+    //输出到合格文件
+    for (let k = 0; k < maxSize; k++) {
+        var pageNo = k+1;
+        for (let pakNo = 0; pakNo < 4; pakNo++) {
+            fs.appendFileSync(filepath, iconv.encode("\""+pageNo+"\","+tmpArr[pakNo][k] + "\r\n", 'gbk'), "binary");
+        }
+    }
+    alert("补打文件已经生成：" + filepath);
 }
 
 function autoID() {
