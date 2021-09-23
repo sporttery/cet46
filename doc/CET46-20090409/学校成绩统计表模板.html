@@ -1,0 +1,45 @@
+<html>
+
+<head>
+  <meta http-equiv=Content-Type content="text/html; charset=gb2312">
+  <style>
+  <!--
+   /* Font Definitions */
+  @page Section1
+  	{size:11.0in 8.5in;
+  	mso-page-orientation:landscape;
+  	margin:1.25in 1.0in 1.25in 1.0in;
+  	mso-header-margin:35.4pt;
+  	mso-footer-margin:35.4pt;
+  	mso-paper-source:0;}
+  div.Section1
+  	{page:Section1;}
+  -->
+  </style>
+  <style>
+    .title {font-family: "宋体"; font-size:12pt; font-weight:bold;}
+    .table {border-bottom: 1px solid black; border-top: 1px solid black;}
+    .header {border-bottom: 1px solid black;}
+    div, td {font-size: 10.5pt;}
+  </style>
+</head>
+
+<body>
+
+<div class=Section1 style="mso-page-orientation:landscape;">
+<T:PAGE>
+<p class=title>%DATE% &nbsp;&nbsp;&nbsp; %CET% &nbsp;&nbsp;&nbsp; 考试成绩单统计表 &nbsp;&nbsp;&nbsp; 学校代码：%XXDM% &nbsp;&nbsp;&nbsp; 学校名称：%XXMC%</p>
+<table width=100% cellspacing=0 cellpadding=2 class=table>
+  <!--thead-->
+    <tr><td width=10% class=header>所属校区</td><td width=10% class=header>院系代码</td><td width=25% class=header>院系名称</td><td width=10% class=header>数量</td><td width=10% class=header>所在包号</td><td width=35% class=header>号段</td></tr>
+  <!--/thead-->
+<T:ROW>  <tr><td>%XQDM%</td><td>%YXDM%</td><td>%YXMC%</td><td>%YXSL%</td><td>%SZBH%</td><td>%QZBH%</td></tr></T:ROW>
+</table>
+合计：%XXSL%
+<br clear=all style='mso-special-character:line-break;page-break-before:always'>
+</T:PAGE>
+</div>
+
+</body>
+
+</html>
