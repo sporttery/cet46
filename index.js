@@ -25,6 +25,7 @@ var tableData = [];
 var alert_like;
 var defaultNavTab = 0;
 var g_data_changed = -1;
+var layerLoadIdx,chk_tlmk;
 var templateHtml = '<html>\
 <head>\
   <meta http-equiv=Content-Type content="text/html; charset=utf8">\
@@ -239,6 +240,14 @@ function save(flag) {
         }
     }
 }
+function tlmkChage(){
+    chk_tlmk = $("#chk_tlmk")[0].checked;
+    var ks_type = $("#ks_type").val();
+    var ks_date = $("#ks_date").val();
+    var tlmk_key = "chk_tlmk_" + ks_date + "_" + ks_type;
+    configuration.saveSettings(tlmk_key, chk_tlmk);
+    delete enabledColumns;//清除缓存
+}
 function loadDefaultConfig() {
     var ks_type = $("#ks_type").val();
     var ks_date = $("#ks_date").val();
@@ -256,6 +265,8 @@ function loadDefaultConfig() {
         defaultTableData = [];
     }
     defaultNavTab = configuration.readSettings("defaultNavTab") || 0;
+    var tlmk_key = "chk_tlmk_" + ks_date + "_" + ks_type;
+    chk_tlmk = configuration.readSettings(tlmk_key);
 }
 
 function selectAll(obj, id) {
@@ -557,7 +568,6 @@ function analyticHandle(file, inputEl) {
     let allDataInFile = {};
     //单个文件里所有合格的数据生成的串，可以直接输出到ok.csv文件里
     let allOkStrInFile = {};
-
     let filename = path.basename(file.filepath);
     let ext = path.extname(file.filepath);
     //合格数据文件
@@ -692,7 +702,7 @@ function analyticHandle(file, inputEl) {
                 let sortNum = enabledColumns["_" + i];
                 currData[tableData[i]["内容"]] = columns[i].replace(".00","");
                 if (sortNum) {
-                    outputData[sortNum] = columns[i];
+                    outputData[sortNum] = columns[i].replace(".00","");
                     if (picIndex == i) {
                         currData["照片"] = columns[i];
                     }
@@ -706,9 +716,9 @@ function analyticHandle(file, inputEl) {
                 outputData[tableData.length + 1] = currData["照片"];
                 outputData[tableData.length + 2] = currData["二维码"];
                 if(chk_tlmk){
-                    if(currDatap["ks_tlmk"]=="0"){
+                    if(currData["ks_tlmk"]=="0"){
                         outputData[tableData.length + 3] = " ";
-                    }else if(currDatap["ks_tlmk"]=="1"){
+                    }else if(currData["ks_tlmk"]=="1"){
                         outputData[tableData.length + 3] = "该考生为听力残疾，听力部分免考，分数经折算计入笔试总分。";
                     }
                 }
@@ -928,7 +938,7 @@ function analyticHandle(file, inputEl) {
         }
     });
 }
-var layerLoadIdx,chk_tlmk;
+
 function doit(obj) {
     if (tableData.length == 0) {
         alert("还没有进行数据定义，请先设置数据");
@@ -950,7 +960,6 @@ function doit(obj) {
     // 能到这里，说明已经配置过数据了，保存当前标签序号，下次直接到这个界面
     defaultNavTab = 1;
     configuration.saveSettings("defaultNavTab", defaultNavTab);
-    chk_tlmk = $("#chk_tlmk")[0].checked;
     setTimeout(() => {
         setProgressbar(0, "");
         progressData = { len: 0, size: 0, currSize: 0, lastProgress: 0 };
@@ -992,16 +1001,24 @@ function doPatch(){
         alert("请按照补号格式输入补号内容");
         return;
     }
-    let patchFileTxt = fs.readFileSync(patchFile).toString();
+    var buffer = Buffer.from(fs.readFileSync(patchFile,{encoding:'binary'}),'binary');
+    var patchFileTxt = iconv.decode(buffer,'GBK').trim();//使用GBK解码
     let patchFileLines = patchFileTxt.split("\r\n");
     let okLines = [];
+    let EMPTY;
     for(var i=0;i<lines.length;i++){
         let line = lines[i].trim();
         if(line.split("-")==2){
             let start = line.split("-")[0];
             let end = line.split("-")[1];
-            okLines.push(patchFileLines.filter(patchLine=>{
+            okLines=okLines.concat(patchFileLines.filter(patchLine=>{
+                if(patchLine.trim().indexOf(",")==-1){
+                    return false;
+                }
                 var zsh = patchLine.split(",")[1].replace(/["']/g,"").trim();
+                if(zsh == "0" && !EMPTY){
+                    EMPTY = patchLine;
+                }
                 return zsh!="" && start <= zsh && end >= zsh;
             }));
         }else if(line.split("+")==3){
@@ -1009,7 +1026,13 @@ function doPatch(){
             var startIdx;
             for(startIdx=1;startIdx<patchFileLines.length;startIdx++){
                 var patchLine = patchFileLines[startIdx];
+                if(patchLine.trim().indexOf(",")==-1){
+                    continue;
+                }
                 var zsh = patchLine.split(",")[1].replace(/["']/g,"").trim();
+                if(zsh == "0" && !EMPTY){
+                    EMPTY = patchLine;
+                }
                 if(arr[0] == zsh){
                     break;
                 }
@@ -1023,19 +1046,57 @@ function doPatch(){
                 okIdx += add ;
             }
         }else {
-            var numArr = line.split(/,/g);
-            okLines.push(patchFileLines.filter(patchLine=>{
-                var zsh = patchLine.split(",")[1].replace(/["']/g,"").trim();
-                return zsh!="" && numArr.indexOf(zsh) !=-1;
-            }));
+            var numArr = line.split(/[,，]/g);
+            if(numArr.length>0){
+                okLines=okLines.concat(patchFileLines.filter(patchLine=>{
+                    if(patchLine.trim().indexOf(",")==-1){
+                        return false;
+                    }
+                    var zsh = patchLine.split(",")[1].replace(/["']/g,"").trim();
+                    if(zsh == "0" && !EMPTY){
+                        EMPTY = patchLine;
+                    }
+                    return zsh!="" && numArr.indexOf(zsh) !=-1;
+                }));
+            }
         }
     }
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = now.getMonth()+1;
+    var date = now.getDate();
+    var hour = now.getHours();
+    var minute = now.getMinutes();
+    var second = now.getSeconds();
+    var datetimestr = ""+year+(month<10?"0"+month:month)+(date<10?"0"+date:date)+(hour<10?"0"+hour:hour)+(minute<10?"0"+minute:minute)+(second<10?"0"+second:second);
     // okLines.unshift(patchFileLines[0]);
-    var filepath = patchFile.split(".ok")[0]+"-"+(+new Date)+".patch"+(patchFile.split(".ok")[1]||"");
+    var filepath = patchFile.split(".ok")[0]+"-"+datetimestr+".patch"+(patchFile.split(".ok")[1]||"");
     fs.appendFileSync(filepath,iconv.encode(patchFileLines[0] + ("\r\n"), 'gbk'), "binary");
-
-
-
+    if(!EMPTY){
+        let firstLine = okLines[0];
+        let tmp=firstLine.split(",");
+        EMPTY="";
+        let len = 2;
+        if(chk_tlmk){
+            len =  3;
+        }
+        for(var i=0;i<tmp.length-len;i++){
+            EMPTY+= "0,";
+        }
+        if(tmp[tmp.length-len].indexOf(".")!=-1){
+            EMPTY+= "empty.jpg,";
+        }else{
+            EMPTY+= "0,";
+        }
+        if(tmp[tmp.length-len-1].indexOf(".")!=-1){
+            EMPTY+= "empty.jpg";
+        }else{
+            EMPTY+= "0";
+        }
+        if(len==3){
+            EMPTY+= ",0";
+        }
+    }
     //打印矩阵数据，每4个一组
     let tmpArr = [[], [], [], []];
     let list = okLines;
@@ -1064,7 +1125,7 @@ function doPatch(){
     for (let k = 0; k < maxSize; k++) {
         var pageNo = k+1;
         for (let pakNo = 0; pakNo < 4; pakNo++) {
-            fs.appendFileSync(filepath, iconv.encode("\""+pageNo+"\","+tmpArr[pakNo][k] + "\r\n", 'gbk'), "binary");
+            fs.appendFileSync(filepath, iconv.encode("\""+pageNo+"\","+tmpArr[pakNo][k].split(",").slice(1).join(",") + "\r\n", 'gbk'), "binary");
         }
     }
     alert("补打文件已经生成：" + filepath);
