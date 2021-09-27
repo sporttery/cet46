@@ -207,7 +207,6 @@ function checkFileColumns(noAlert) {
 function save(flag) {
     if (!flag) {
         if (checkFolder()) {
-
             configuration.saveSettings("folderArr", JSON.stringify(folderArr))
             defaultFolderArr = [].concat(folderArr);
             if (tableData.length > 0) { //如果数据定义已经Ok，开启查找文件功能
@@ -219,7 +218,7 @@ function save(flag) {
     } else {
         if (checkFileColumns()) {
             //如果列发生了变化，清除缓存
-            delete enabledColumns;//清除缓存
+            cleanCache();
             var ks_type = $("#ks_type").val();
             var ks_date = $("#ks_date").val();
             var tableKey = "tableData_" + ks_date + "_" + ks_type;
@@ -550,7 +549,7 @@ var progressData = { len: 0, size: 0, currSize: 0, lastProgress: 0 };
 function cleanCache() {
     delete EMPTY;
     delete EMPTYOBJ;
-    delete enabledColumns;
+    enabledColumns=false;
     progressData = { len: 0, size: 0, currSize: 0, lastProgress: 0 };
     chk_tlmk = $("#chk_tlmk")[0].checked;
 }
