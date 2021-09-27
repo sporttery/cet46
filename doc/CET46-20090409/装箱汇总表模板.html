@@ -1,0 +1,41 @@
+<html>
+
+<head>
+  <meta http-equiv=Content-Type content="text/html; charset=gb2312">
+  <style>
+  <!--
+   /* Font Definitions */
+  @page Section1
+  	{size:11.0in 8.5in;
+  	margin:1.25in 1.0in 1.25in 1.0in;
+  	mso-header-margin:35.4pt;
+  	mso-footer-margin:35.4pt;
+  	mso-paper-source:0;}
+  div.Section1
+  	{page:Section1;}
+  -->
+  </style>
+  <style>
+    .title {font-family: "宋体"; font-size:12pt; font-weight:bold; text-align: center;}
+    .table {border-collapse: collapse; border: none;}
+    .header {}
+    div, td {font-size: 10.5pt;}
+    td {border:solid black 1.0pt;}
+  </style>
+</head>
+
+<body>
+
+<div class=Section1 style="mso-page-orientation:landscape;">
+<p class=title>%DATE% %PROV% %CETX% 各学校成绩报告单汇总</p>
+<table width=100% cellspacing=0 cellpadding=2 class=table border=1>
+  <thead>
+    <tr><td width=10% class=header>学校代码</td><td width=30% class=header>学校名称</td><td width=10% class=header>所在箱号</td><td width=10% class=header>成绩单数量</td><td width=10% class=header>包数</td><td width=15% class=header>起始证书编号</td><td width=15% class=header>结束证书编号</td></tr>
+  </thead>
+<T:ROW>  <tr><td>%XXDM%</td><td>%XXMC%</td><td>%SZXH%</td><td>%CJDSL%</td><td>%BS%</td><td>%ZSBH1%</td><td>%ZSBH2%</td></tr></T:ROW>
+</table>
+</div>
+
+</body>
+
+</html>
