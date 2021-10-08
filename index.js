@@ -477,15 +477,15 @@ var checkDataFun = {
         var _xxdm = ks_bmh.substring(0, 5);
         var _xqdm = ks_bmh[5];
         var _yyjb = ks_bmh[6];
-        if (currData["KS_SSXX"] && _xxdm != currData["KS_SSXX"]) { //学校代码不一致
-            err.push("学校代码不一致");
-        }
-        if (currData["KS_BMXQ"] && _xqdm != currData["KS_BMXQ"]) { //校区代码不一致
-            err.push("校区代码不一致");
-        }
-        if (currData["KS_YYJB"] && _yyjb != currData["KS_YYJB"]) { //语言级别代码不一致
-            err.push("语言级别代码不一致");
-        }
+        // if (currData["KS_SSXX"] && _xxdm != currData["KS_SSXX"]) { //学校代码不一致
+        //     err.push("学校代码不一致");
+        // }
+        // if (currData["KS_BMXQ"] && _xqdm != currData["KS_BMXQ"]) { //校区代码不一致
+        //     err.push("校区代码不一致");
+        // }
+        // if (currData["KS_YYJB"] && _yyjb != currData["KS_YYJB"]) { //语言级别代码不一致
+        //     err.push("语言级别代码不一致");
+        // }
         if (picIndex != -1) {
             picFolder = path.join(folderArr[1], sf, _xxdm, _xqdm, _yyjb);
             if (fs.existsSync(path.join(picFolder, currData["照片"] + ".jpg"))) {
