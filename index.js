@@ -279,7 +279,8 @@ function selectAll(obj, id) {
 // 法语四级	CFT4.CSV
 
 const allowFileName = {
-    CET4: 1, CET6: 1, CJT4: 1, CJT6: 1, CGT4: 1, CGT6: 1, CRT4: 1, CRT6: 1, CFT4: 1, CFT6: 1
+    CET4: 1, CET6: 1, CJT4: 1, CJT6: 1, CGT4: 1, CGT6: 1, CRT4: 1, CRT6: 1, CFT4: 1, CFT6: 1,
+    "英语四级": 1, "英语六级": 1, "日语四级": 1, "日语六级": 1, "德语四级": 1, "德语六级": 1, "俄语四级": 1, "俄语六级": 1, "法语四级": 1, "法语六级": 1
 };
 const allowFileNameReg = new RegExp("^(" + Object.keys(allowFileName).join("|") + ")_\\d+\\..*$");
 function getFiles(sourceDir, includeSubFolder, filetypes) {
@@ -489,22 +490,36 @@ var checkDataFun = {
         if (picIndex != -1) {
             picFolder = path.join(folderArr[1], sf, _xxdm, _xqdm, _yyjb);
             if (fs.existsSync(path.join(picFolder, currData["照片"] + ".jpg"))) {
-                currData["照片"] = currData["照片"] + ".jpg";
+                currData["照片"] = path.join(sf, _xxdm, _xqdm, _yyjb, currData["照片"] + ".jpg");
             } else if (fs.existsSync(path.join(picFolder, currData["照片"] + ".png"))) {
-                currData["照片"] = currData["照片"] + ".png";
+                currData["照片"] = path.join(sf, _xxdm, _xqdm, _yyjb, currData["照片"] + ".png");
             } else {
-                err.push("照片不存在 [" + picFolder + "\\" + currData["照片"] + "]");
+                err.push("照片不存在 [" + path.join(picFolder, currData["照片"] + ".jpg") + "]");
             }
         }
         if (qrcodeIndex != -1) {
             picFolder = path.join(folderArr[2], sf, _xxdm, _xqdm, _yyjb);
             if (fs.existsSync(path.join(picFolder, currData["二维码"] + ".jpg"))) {
-                currData["二维码"] = currData["二维码"] + ".jpg";
+                currData["二维码"] = path.join(sf, _xxdm, _xqdm, _yyjb, currData["二维码"] + ".jpg");
             } else if (fs.existsSync(path.join(picFolder, currData["二维码"] + ".png"))) {
-                currData["二维码"] = currData["二维码"] + ".png";
+                currData["二维码"] = path.join(sf, _xxdm, _xqdm, _yyjb, currData["二维码"] + ".png");
             } else {
-                err.push("二维码不存在 [" + picFolder + "\\" + currData["二维码"] + "]");
+                err.push("二维码不存在 [" + path.join(picFolder, currData["二维码"] + ".jpg") + "]");
             }
+        }
+        if (currData["ks_zkz_xs"].length == 15) {
+            currData["笔试考试时间"] = "2021年6月";
+        } else if (currData["ks_zkz_xs"] == "--") {
+            currData["笔试考试时间"] = "--";
+        } else {
+            err.push("笔试考试时间所需要字段(ks_zkz_xs)值不符合要求");
+        }
+        if (currData["ky_zkz"].length == 15) {
+            currData["笔试考试时间"] = "2021年5月";
+        } else if (currData["ky_zkz"] == "--") {
+            currData["笔试考试时间"] = "--";
+        } else {
+            err.push("笔试考试时间所需要字段(ky_zkz)值不符合要求");
         }
         if (err.length > 0) {
             return err.join(",");
@@ -549,7 +564,7 @@ var progressData = { len: 0, size: 0, currSize: 0, lastProgress: 0 };
 function cleanCache() {
     delete EMPTY;
     delete EMPTYOBJ;
-    enabledColumns=false;
+    enabledColumns = false;
     progressData = { len: 0, size: 0, currSize: 0, lastProgress: 0 };
     chk_tlmk = $("#chk_tlmk")[0].checked;
 }
@@ -620,6 +635,8 @@ function analyticHandle(file, inputEl) {
     }
     headLine.push("照片");
     headLine.push("二维码");
+    headLine.push("笔试考试时间");
+    headLine.push("口语考试时间");
 
     if (chk_tlmk) {
         headLine.push("chk_tlmk");
@@ -691,13 +708,16 @@ function analyticHandle(file, inputEl) {
             if (errMsg == "") {
                 outputData[tableData.length + 1] = currData["照片"];
                 outputData[tableData.length + 2] = currData["二维码"];
+                outputData[tableData.length + 3] = currData["笔试考试时间"];
+                outputData[tableData.length + 4] = currData["口语考试时间"];
                 if (chk_tlmk) {
                     if (currData["ks_tlmk"] == "0") {
-                        outputData[tableData.length + 3] = " ";
+                        outputData[tableData.length + 5] = " ";
                     } else if (currData["ks_tlmk"] == "1") {
-                        outputData[tableData.length + 3] = "该考生为听力残疾，听力部分免考，分数经折算计入笔试总分。";
+                        outputData[tableData.length + 5] = "该考生为听力残疾，听力部分免考，分数经折算计入笔试总分。";
                     }
                 }
+
             } else {
                 // console.log(" 第" + lineCount + "行 报错" + errMsg + " -> " + line);
             }
@@ -1100,7 +1120,7 @@ function doPatch() {
     alert("补打文件已经生成：" + filepath);
 }
 
-function getDateStr(){
+function getDateStr() {
     var now = new Date();
     var year = now.getFullYear();
     var month = now.getMonth() + 1;
@@ -1235,6 +1255,46 @@ function setTableData() {
         $("#chk_qrcode_no").next()[0].click();
     }
     $("#tableData").html(html.join(""));
+}
+
+function splitFile() {
+    $("#splitFileBtn").addClass("disabled").attr("disabled", "disabled");
+    $("#splitFilesSelect").click();
+}
+
+function doSplitFile() {
+    var files = document.querySelector("#splitFilesSelect").files;
+    if (files.length > 0) {
+        var msg = [];
+        files.forEach(file => {
+            var name = file.name;
+            var fullpath = file.path;
+            var extName = path.extname(fullpath);
+            var fullpath_0 = fullpath.replace(extName, "");
+            var content = fs.readFileSync(fullpath, "utf8").toString();
+            var lines = content.split("\n");
+            var headLine = lines[0].trim();
+            var sfLines = {};
+            for (var i = 1; i < lines.length; i++) {
+                var line = lines[i].trim();
+                var fields = line.split(",");
+                var sf = fields[2].substring(0, 2);
+                var arr = sfLines[sf];
+                if (!arr) {
+                    arr = [headLine]
+                    sfLines[sf] = arr;
+                }
+                arr.push(line);
+            }
+            for (var sf in sfLines) {
+                var filepath_ = fullpath_0 + "_" + sf + extName;
+                msg.push("创建文件 " + filepath_);
+                fs.writeFileSync(filepath_, sfLines[sf].join("\r\n"));
+            }
+        });
+        alert(msg.join("<br/>"), "分隔文件处理完成");
+    }
+    $("#splitFileBtn").removeClass("disabled").removeAttr("disabled");
 }
 
 module.exports = {

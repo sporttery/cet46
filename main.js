@@ -7,7 +7,7 @@ let win
 
 function createWindow () {
   // 创建浏览器窗口.
-  win = new BrowserWindow({width: 900, height: 680,autoHideMenuBar :true})
+  win = new BrowserWindow({width: 1200, height: 800,autoHideMenuBar :true})
 
   win.setMenu(null);
 

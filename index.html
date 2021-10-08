@@ -16,7 +16,7 @@
 	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
 	<script src="js/bootstrap.min.js" crossorigin="anonymous"></script>
 	<script src="js/layer.js"></script>
-	<title>CET46数据分析软件-鸿博股份-V1.2</title>
+	<title>CET46数据分析软件-鸿博股份-V1.3</title>
 	<style>
 		.folderTxt.form-control {
 			width: 95%;
@@ -192,8 +192,9 @@
 							<button class="btn btn-default disabled" disabled="disabled" id="btnData"onclick="doit(this)">开始处理</button>	
 							&nbsp;&nbsp;
 							<input type="checkbox" id="includeSubFolder" /><label for="includeSubFolder">子目录</label>
-							<!-- &nbsp;&nbsp;
-							<button class="btn btn-link" onclick="location.reload()">刷新</button> -->
+							 &nbsp;&nbsp;
+							 <input type="file" id="splitFilesSelect" style="display: none;" multiple onchange="doSplitFile()" />
+							 <button class="btn btn-default" id="splitFileBtn" onclick="splitFile()">文件拆分</button>
 						</div>
 						<div class="col-sm-8">
 							<div class="input-group">
