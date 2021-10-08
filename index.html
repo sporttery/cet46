@@ -23,7 +23,8 @@
 			margin-right: 10px;
 			display: inline;
 		}
-		#fileData td{
+
+		#fileData td {
 			vertical-align: middle;
 		}
 	</style>
@@ -33,23 +34,25 @@
 	<div class="container-fluid">
 		<!-- Nav tabs -->
 		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation"><a href="#profile" aria-controls="profile" role="tab"
-					data-toggle="tab">系统设置</a>
+			<li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">系统设置</a>
 			</li>
-			<li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab" data-toggle="tab">数据处理</a></li>
+			<li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab"
+					data-toggle="tab">数据处理</a></li>
+			<li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">数据定义</a>
+			</li>
 			<li role="presentation"><a href="#patch" aria-controls="patch" role="tab" data-toggle="tab">补号</a></li>
-			<li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">数据定义</a></li>
 		</ul>
 		<!-- Tab panes -->
 		<div class="tab-content">
 
 			<div role="tabpanel" class="tab-pane " id="profile">
 				<input type="file" webkitdirectory directory class="hide" id="folderBtn" onchange="setFolder()" />
-				
+
 				<div class="view">
 					<br />
 					<div class="input-group">
-						<span class="input-group-addon" style="cursor: pointer;" onclick="openDir($(this).next().val())" title="点击打开文件夹"> 数据文件夹 </span>
+						<span class="input-group-addon" style="cursor: pointer;" onclick="openDir($(this).next().val())"
+							title="点击打开文件夹"> 数据文件夹 </span>
 						<input type="text" class="form-control" placeholder="选择原始数据所在的文件夹..." />
 						<span class="input-group-btn">
 							<input class="btn btn-default" type="button" value="x" title="清除" />
@@ -58,7 +61,8 @@
 					</div>
 					<br />
 					<div class="input-group">
-						<span class="input-group-addon" style="cursor: pointer;" onclick="openDir($(this).next().val())" title="点击打开文件夹"> 照片文件夹 </span>
+						<span class="input-group-addon" style="cursor: pointer;" onclick="openDir($(this).next().val())"
+							title="点击打开文件夹"> 照片文件夹 </span>
 						<input type="text" class="form-control" placeholder="选择照片所在的文件夹..." />
 						<span class="input-group-btn">
 							<input class="btn btn-default" type="button" value="x" title="清除" />
@@ -67,7 +71,8 @@
 					</div>
 					<br />
 					<div class="input-group">
-						<span class="input-group-addon" style="cursor: pointer;" onclick="openDir($(this).next().val())" title="点击打开文件夹"> 二维码目录 </span>
+						<span class="input-group-addon" style="cursor: pointer;" onclick="openDir($(this).next().val())"
+							title="点击打开文件夹"> 二维码目录 </span>
 						<input type="text" class="form-control" placeholder="选择二维码所在的文件夹..." />
 						<span class="input-group-btn">
 							<input class="btn btn-default" type="button" value="x" title="清除" />
@@ -76,7 +81,8 @@
 					</div>
 					<br />
 					<div class="input-group">
-						<span class="input-group-addon" style="cursor: pointer;" onclick="openDir($(this).next().val())" title="点击打开文件夹"> 合格文件夹 </span>
+						<span class="input-group-addon" style="cursor: pointer;" onclick="openDir($(this).next().val())"
+							title="点击打开文件夹"> 合格文件夹 </span>
 						<input type="text" class="form-control" placeholder="选择合格数据输出的文件夹..." />
 						<span class="input-group-btn">
 							<input class="btn btn-default" type="button" value="x" title="清除" />
@@ -85,7 +91,8 @@
 					</div>
 					<br />
 					<div class="input-group">
-						<span class="input-group-addon" style="cursor: pointer;" onclick="openDir($(this).next().val())" title="点击打开文件夹"> 错误文件夹 </span>
+						<span class="input-group-addon" style="cursor: pointer;" onclick="openDir($(this).next().val())"
+							title="点击打开文件夹"> 错误文件夹 </span>
 						<input type="text" class="form-control" placeholder="选择错误数据输出的文件夹..." />
 						<span class="input-group-btn">
 							<input class="btn btn-default" type="button" value="x" title="清除" />
@@ -110,31 +117,37 @@
 				</div>
 				<div class="view" style="line-height: 45px;">
 					<table class="table table-striped table-bordered">
-					<thead>
-						<tr>
-						<th>字段内容</th>
-						<th>字段说明
-						</th>
-						<th><input type="checkbox" id="tableDataCkb" onchange="selectAll(this,'tableData')"  style="cursor:pointer;width:20px;height:20px"/><label for="tableDataCkb">启用</label></th>
-						<th>输出顺序</th>
-						</tr>
-					</thead>
-					<tbody id="tableData">
-						<tr>
-							<td colspan="4" style="text-align: center;">暂无数据</td>
-						</tr>
-					</tbody>
+						<thead>
+							<tr>
+								<th>字段内容</th>
+								<th>字段说明
+								</th>
+								<th><input type="checkbox" id="tableDataCkb" onchange="selectAll(this,'tableData')"
+										style="cursor:pointer;width:20px;height:20px" /><label
+										for="tableDataCkb">启用</label></th>
+								<th>输出顺序</th>
+							</tr>
+						</thead>
+						<tbody id="tableData">
+							<tr>
+								<td colspan="4" style="text-align: center;">暂无数据</td>
+							</tr>
+						</tbody>
 					</table>
 				</div>
 				<div class="view">
 					<p>
-						<input type="radio" name="chk_pic" id="chk_pic_no" value="-1" onchange="picChange()"><label for="chk_pic_no">不检测照片</label>
-						<input type="radio" name="chk_qrcode" id="chk_qrcode_no" value="-1" onchange="qrcodeChange()"><label for="chk_qrcode_no">不检测二维码</label>
+						<input type="radio" name="chk_pic" id="chk_pic_no" value="-1" onchange="picChange()"><label
+							for="chk_pic_no">不检测照片</label>
+						<input type="radio" name="chk_qrcode" id="chk_qrcode_no" value="-1"
+							onchange="qrcodeChange()"><label for="chk_qrcode_no">不检测二维码</label>
 					</p>
 					<p>
-						<input type="checkbox" name="chk_tlmk" id="chk_tlmk" value="1" onchange="tlmkChage()" ><label for="chk_tlmk">判断听力障碍标准</label>
+						<input type="checkbox" name="chk_tlmk" id="chk_tlmk" value="1" onchange="tlmkChage()"><label
+							for="chk_tlmk">判断听力障碍标准</label>
 						<br>
-						<span style="font-size: small;color: red;">判断"Ks_tlmk",当为"0"的时候输出" "，当为"1"的时候输出"该考生为听力残疾，听力部分免考，分数经折算计入笔试总分。"</span>
+						<span style="font-size: small;color: red;">判断"Ks_tlmk",当为"0"的时候输出"
+							"，当为"1"的时候输出"该考生为听力残疾，听力部分免考，分数经折算计入笔试总分。"</span>
 					</p>
 				</div>
 				<div class="view" style="text-align: right;margin-top:20px;">
@@ -145,22 +158,25 @@
 			</div>
 
 			<div role="tabpanel" class="tab-pane " id="patch">
-				<input type="file"  class="hide" id="patchFileBtn" onchange="$('#patchFile').val(this.files[0].path)"/>
-				
+				<input type="file" class="hide" id="patchFileBtn" onchange="$('#patchFile').val(this.files[0].path)" />
+
 				<div class="view">
 					<br />
 					<div class="input-group">
-						<span class="input-group-addon" style="cursor: pointer;" onclick="openFile($(this).next().val())" title="点击打开文件"> 数据文件 .ok </span>
+						<span class="input-group-addon" style="cursor: pointer;"
+							onclick="openFile($(this).next().val())" title="点击打开文件"> 数据文件 .ok </span>
 						<input type="text" class="form-control" id="patchFile" placeholder="选择OK数据文件..." />
 						<span class="input-group-btn">
-							<input class="btn btn-default" type="button" value="x" title="清除" onclick="$('#patchFile').val('')" />
-							<input class="btn btn-default" type="button" value="..." onclick="$('#patchFileBtn').click()" />
+							<input class="btn btn-default" type="button" value="x" title="清除"
+								onclick="$('#patchFile').val('')" />
+							<input class="btn btn-default" type="button" value="..."
+								onclick="$('#patchFileBtn').click()" />
 						</span>
 					</div>
 				</div>
 				<div class="view">
 					<p></p>
-					<p>直接在下面输入证书编号,用逗号、分号、空格或换行分隔开。生成的数据将按下列格式顺序排列: 			 </p>		
+					<p>直接在下面输入证书编号,用逗号、分号、空格或换行分隔开。生成的数据将按下列格式顺序排列: </p>
 					<p>[格式1]直接输入单个号码,如:081211002000001,081211002000003,081211002000007 </p>
 					<p>[格式2]用"+"输入增量号码,如:0812110000001+500+4,表示从081211002000001开始,号码递增500印4张 </p>
 					<p>[格式3]用"连接两个号码可以输入号码段,如:081211002000010(包含)-081211002000100(包含)</p>
@@ -169,32 +185,36 @@
 					<form role="form">
 						<!-- 单选 -->
 						<div class="form-group">
-							<textarea name="patchTxt" id="patchTxt" cols="30" rows="10"  class="form-control"></textarea>
+							<textarea name="patchTxt" id="patchTxt" cols="30" rows="10" class="form-control"></textarea>
 						</div>
 					</form>
 				</div>
 				<div class="view">
 					<p>&nbsp;</p>
 					<div class="view" style="text-align: center; vertical-align: middle;">
-					拼数：<input type="number" id="pageSize" min="1" max="10" value="4" maxlength="1" width="4" readonly/>
-					<input type="button" value="生成补打文件" onclick="doPatch()"/>
-					<p>&nbsp;</p>
-					<p>&nbsp;</p>
-				</div>
+						拼数：<input type="number" id="pageSize" min="1" max="10" value="4" maxlength="1" width="4"
+							readonly />
+						<input type="button" value="生成补打文件" onclick="doPatch()" />
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+					</div>
 				</div>
 			</div>
 
 			<div role="tabpanel" class="tab-pane active" id="main">
-				<div class="view"  style="padding: 11px 0;">
+				<div class="view" style="padding: 11px 0;">
 					<div class="row">
 						<div class="col-sm-4">
-							<button class="btn btn-default disabled" disabled="disabled" id="btnFindFile" onclick="findFile(this)">查找文件</button>
-							<button class="btn btn-default disabled" disabled="disabled" id="btnData"onclick="doit(this)">开始处理</button>	
+							<button class="btn btn-default disabled" disabled="disabled" id="btnFindFile"
+								onclick="findFile(this)">查找文件</button>
+							<button class="btn btn-default disabled" disabled="disabled" id="btnData"
+								onclick="doit(this)">开始处理</button>
 							&nbsp;&nbsp;
 							<input type="checkbox" id="includeSubFolder" /><label for="includeSubFolder">子目录</label>
-							 &nbsp;&nbsp;
-							 <input type="file" id="splitFilesSelect" style="display: none;" multiple onchange="doSplitFile()" />
-							 <button class="btn btn-default" id="splitFileBtn" onclick="splitFile()">文件拆分</button>
+							&nbsp;&nbsp;
+							<input type="file" id="splitFilesSelect" style="display: none;" multiple
+								onchange="doSplitFile()" />
+							<button class="btn btn-default" id="splitFileBtn" onclick="splitFile()">文件拆分</button>
 						</div>
 						<div class="col-sm-8">
 							<div class="input-group">
@@ -206,10 +226,10 @@
 								</select>
 								<span class="input-group-addon" id="basic-addon3">考试年份</span>
 								<!-- <input type="text" maxlength="20" class="form-control" aria-describedby="basic-addon3" id="ks_date"  /> -->
-								<select class="form-control" aria-describedby="basic-addon3" id="ks_date" ></select>
+								<select class="form-control" aria-describedby="basic-addon3" id="ks_date"></select>
 								<span class="input-group-addon" id="basic-addon4">考试类型</span>
 								<!-- <input type="text" maxlength="20" class="form-control" aria-describedby="basic-addon4" id="ks_type" value="CET4"  /> -->
-								<select class="form-control" aria-describedby="basic-addon4" id="ks_type" ></select>
+								<select class="form-control" aria-describedby="basic-addon4" id="ks_type"></select>
 							</div>
 						</div>
 					</div>
@@ -226,10 +246,12 @@
 					<table class="table table-striped table-bordered">
 						<thead>
 							<tr>
-								<th width="5%"><input type="checkbox" id="selectAll"  style="cursor:pointer;width:20px;height:20px" onchange="selectAll(this,'fileData')" /></th>
+								<th width="5%"><input type="checkbox" id="selectAll"
+										style="cursor:pointer;width:20px;height:20px"
+										onchange="selectAll(this,'fileData')" /></th>
 								<th>文件</th>
-								<th  width="10%">状态</th>
-								<th  width="20%">结果</th>
+								<th width="10%">状态</th>
+								<th width="20%">结果</th>
 							</tr>
 						</thead>
 						<tbody id="fileData">
@@ -240,7 +262,7 @@
 					</table>
 				</div>
 			</div>
-			
+
 		</div>
 	</div>
 
@@ -263,41 +285,42 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<script id="indexJs" src="index.js"></script>
 	<script>
-		function loadTableData(){
-			tableData=[].concat(defaultTableData);
+		function loadTableData() {
+			tableData = [].concat(defaultTableData);
 			setTableData();
-			if(!checkFolder()){//目录检查没有通过
+			if (!checkFolder()) {//目录检查没有通过
 				$(".nav a")[0].click();
-			}else if(tableData.length ==0){//数据定义没有通过
+			} else if (tableData.length == 0) {//数据定义没有通过
 				$(".nav a")[2].click();
-			}else { //如果数据定义已经Ok，开启查找文件功能
+			} else { //如果数据定义已经Ok，开启查找文件功能
 				$(".nav a")[parseInt(defaultNavTab)].click();
 				$("#btnFindFile").removeAttr("disabled").removeClass("disabled");
-				g_data_changed=-1;
+				g_data_changed = -1;
 			}
-			$("#chk_tlmk").attr("checked",chk_tlmk);
+			$("#chk_tlmk").attr("checked", chk_tlmk);
 		}
 		$(() => {
 			var date = new Date();
 			var year = date.getFullYear();
-			var options=[];
-			for(var i=0;i<=20;i++){
-				options.push('<option value="'+(year-i)+'">'+(year-i)+'年</option>');
+			var options = [];
+			for (var i = 0; i <= 20; i++) {
+				options.push('<option value="' + (year - i) + '">' + (year - i) + '年</option>');
 			}
-			$("#ks_date").html(options.join("")).on("change",()=>{
+			$("#ks_date").html(options.join("")).on("change", () => {
 				loadDefaultConfig();
 				loadTableData();
 			});
-			var options=[];
-			for(var type in allowFileName){
-				options.push('<option value="'+type+'">'+type+'</option>');
+			var options = [];
+			for (var type in allowFileName) {
+				options.push('<option value="' + type + '">' + type + '</option>');
 			}
-			$("#ks_type").html(options.join("")).on("change",()=>{
+			$("#ks_type").html(options.join("")).on("change", () => {
 				loadDefaultConfig();
 				loadTableData();
+				$("#btnFindFile").click();
 			});
 			loadDefaultConfig();
 			$("#profile .input-group").each((idx, el) => {

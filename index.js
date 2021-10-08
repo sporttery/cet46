@@ -279,11 +279,10 @@ function selectAll(obj, id) {
 // 法语四级	CFT4.CSV
 
 const allowFileName = {
-    CET4: 1, CET6: 1, CJT4: 1, CJT6: 1, CGT4: 1, CGT6: 1, CRT4: 1, CRT6: 1, CFT4: 1, CFT6: 1,
-    "英语四级": 1, "英语六级": 1, "日语四级": 1, "日语六级": 1, "德语四级": 1, "德语六级": 1, "俄语四级": 1, "俄语六级": 1, "法语四级": 1, "法语六级": 1
+    "CET4|英语四级": 1, "CET6|英语六级": 1, "CJT4|日语四级": 1, "CJT6|日语六级": 1, "CGT4|德语四级": 1, "CGT6|德语六级": 1, "CRT4|俄语四级": 1, "CRT6|俄语六级": 1, "CFT4|法语四级": 1, "CFT6|法语六级": 1
 };
-const allowFileNameReg = new RegExp("^(" + Object.keys(allowFileName).join("|") + ")_\\d+\\..*$");
 function getFiles(sourceDir, includeSubFolder, filetypes) {
+    const allowFileNameReg = new RegExp("^(" + $("#ks_type").val() + ")_\\d+\\..*$");
     let allfiles = [];
     function findFiles(dir, includeSubFolder, filetypes) {
         let files = fs.readdirSync(dir);
@@ -466,7 +465,7 @@ var kyDataMap = { "A": 1, "A+": 1, "B": 1, "B+": 1, "C": 1, "C+": 1, "--": 1 };
 var checkDataFun = {
     "DEFAULT": function (currData, sf) {
         //准考证号
-        var ks_zkz = currData["ks_zkz"];
+        var ks_zkz = currData["KS_ZKZ"];
         var _sf = ks_zkz.substring(0, 2);
         var err = [];
         if (_sf != sf) {
@@ -474,17 +473,17 @@ var checkDataFun = {
         }
         //省代码（报名号前2位）\学校代码（报名号前5位）\校区代码（报名号第6位）\语言级别代码（报名号第7位）\报名号.jpg
         //报名号
-        var ks_bmh = currData["ks_bmh"];
+        var ks_bmh = currData["KS_BMH"];
         var _xxdm = ks_bmh.substring(0, 5);
         var _xqdm = ks_bmh[5];
         var _yyjb = ks_bmh[6];
-        if (currData["ks_ssxx"] && _xxdm != currData["ks_ssxx"]) { //学校代码不一致
+        if (currData["KS_SSXX"] && _xxdm != currData["KS_SSXX"]) { //学校代码不一致
             err.push("学校代码不一致");
         }
-        if (currData["ks_bmxq"] && _xqdm != currData["ks_bmxq"]) { //校区代码不一致
+        if (currData["KS_BMXQ"] && _xqdm != currData["KS_BMXQ"]) { //校区代码不一致
             err.push("校区代码不一致");
         }
-        if (currData["ks_yyjb"] && _yyjb != currData["ks_yyjb"]) { //语言级别代码不一致
+        if (currData["KS_YYJB"] && _yyjb != currData["KS_YYJB"]) { //语言级别代码不一致
             err.push("语言级别代码不一致");
         }
         if (picIndex != -1) {
@@ -507,46 +506,27 @@ var checkDataFun = {
                 err.push("二维码不存在 [" + path.join(picFolder, currData["二维码"] + ".jpg") + "]");
             }
         }
-        if (currData["ks_zkz_xs"].length == 15) {
-            currData["笔试考试时间"] = "2021年6月";
-        } else if (currData["ks_zkz_xs"] == "--") {
-            currData["笔试考试时间"] = "--";
+        if (currData["KS_ZKZ_XS"]) {
+            if (currData["KS_ZKZ_XS"].length == 15) {
+                currData["笔试考试时间"] = "2021年6月";
+            } else if (currData["KS_ZKZ_XS"] == "--") {
+                currData["笔试考试时间"] = "--";
+            } else {
+                err.push("笔试考试时间所需要字段(ks_zkz_xs)值不符合要求");
+            }
         } else {
-            err.push("笔试考试时间所需要字段(ks_zkz_xs)值不符合要求");
-        }
-        if (currData["ky_zkz"].length == 15) {
-            currData["笔试考试时间"] = "2021年5月";
-        } else if (currData["ky_zkz"] == "--") {
             currData["笔试考试时间"] = "--";
+        }
+        if (currData["KY_ZKZ"]) {
+            if (currData["KY_ZKZ"].length == 15) {
+                currData["口语考试时间"] = "2021年5月";
+            } else if (currData["KY_ZKZ"] == "--") {
+                currData["口语考试时间"] = "--";
+            } else {
+                err.push("口语考试时间所需要字段(ky_zkz)值不符合要求");
+            }
         } else {
-            err.push("笔试考试时间所需要字段(ky_zkz)值不符合要求");
-        }
-        if (err.length > 0) {
-            return err.join(",");
-        }
-        return "";
-    },
-    "CET": function (currData, sf) {
-        var defalutCheckResult = this.DEFAULT(currData, sf);
-        if (defalutCheckResult != "") {
-            return defalutCheckResult;
-        }
-        //准考证号
-        var ks_zkz = currData["ks_zkz"];
-        //口语准考证
-        var ky_zkz = currData["ky_zkz"];
-        //口语成绩
-        var ky_sco = currData["ky_sco"];
-        var err = [];
-        var _yyjb = ks_zkz[9];
-        if (_yyjb == 1 && ky_zkz[0] != 'F') {
-            err.push("语言级别和口试准考证第一位没有对应");
-        }
-        if (_yyjb == 2 && ky_zkz[0] != 'S') {
-            err.push("语言级别和口试准考证第一位没有对应");
-        }
-        if (!kyDataMap[ky_sco]) {
-            err.push("口语成绩[" + ky_sco + "]不符合");
+            currData["口语考试时间"] = "--";
         }
         if (err.length > 0) {
             return err.join(",");
@@ -554,6 +534,37 @@ var checkDataFun = {
         return "";
     }
 };
+checkDataFun["CET"] = function (currData, sf) {
+    var defalutCheckResult = checkDataFun.DEFAULT(currData, sf);
+    if (defalutCheckResult != "") {
+        return defalutCheckResult;
+    }
+    //准考证号
+    var ks_zkz = currData["KS_ZKZ"];
+    //口语准考证
+    var ky_zkz = currData["KY_ZKZ"];
+    //口语成绩
+    var ky_sco = currData["KY_SCO"];
+    var err = [];
+    var _yyjb = ks_zkz[9];
+    if (ky_zkz != "--" && _yyjb == 1 && ky_zkz[0] != 'F') {
+        err.push("语言级别和口试准考证第一位没有对应");
+    }
+    if (ky_zkz != "--" && _yyjb == 2 && ky_zkz[0] != 'S') {
+        err.push("语言级别和口试准考证第一位没有对应");
+    }
+    if (!kyDataMap[ky_sco]) {
+        err.push("口语成绩[" + ky_sco + "]不符合");
+    }
+    if (err.length > 0) {
+        return err.join(",");
+    }
+    return "";
+}
+checkDataFun["CET4"] = checkDataFun["CET"]
+checkDataFun["CET6"] = checkDataFun["CET"]
+checkDataFun["英语四级"] = checkDataFun["CET"]
+checkDataFun["英语六级"] = checkDataFun["CET"]
 
 //空数据
 var EMPTY, EMPTYOBJ;
@@ -657,8 +668,8 @@ function analyticHandle(file, inputEl) {
         let lineLen = getByteLen(line) + 2;
         sumlen += lineLen;
         progressData.currSize += lineLen;
-        line = line.replace(/["'\s]/g, "");
-        if (line.length > 0 && line[0] != 'k') { //列头不处理
+        line = line.replace(/["']/g, "").trim();
+        if (line.length > 0 && line[0].toUpperCase() != 'K') { //列头不处理
             lineCount++;
             //设置进度
             let currProgress = Math.floor((sumlen * 100 / totalSize));
@@ -687,6 +698,7 @@ function analyticHandle(file, inputEl) {
                 readObj.pause();*/
                 errCount = -1;
                 readObj.close();
+                layer.close(layerLoadIdx);
                 return false;
             }
             let outputData = []; //按排序号的排序的内容
@@ -711,9 +723,9 @@ function analyticHandle(file, inputEl) {
                 outputData[tableData.length + 3] = currData["笔试考试时间"];
                 outputData[tableData.length + 4] = currData["口语考试时间"];
                 if (chk_tlmk) {
-                    if (currData["ks_tlmk"] == "0") {
+                    if (currData["KS_TLMK"] == "0") {
                         outputData[tableData.length + 5] = " ";
-                    } else if (currData["ks_tlmk"] == "1") {
+                    } else if (currData["KS_TLMK"] == "1") {
                         outputData[tableData.length + 5] = "该考生为听力残疾，听力部分免考，分数经折算计入笔试总分。";
                     }
                 }
@@ -736,15 +748,15 @@ function analyticHandle(file, inputEl) {
             } else {
                 //ks_ssxx 学校代码
                 //dm_mc 学校名称
-                if (!allOkStrInFile[currData["ks_ssxx"]]) {
-                    allOkStrInFile[currData["ks_ssxx"]] = [];
+                if (!allOkStrInFile[currData["KS_SSXX"]]) {
+                    allOkStrInFile[currData["KS_SSXX"]] = [];
                 }
-                allOkStrInFile[currData["ks_ssxx"]].push(csvLineStr);
+                allOkStrInFile[currData["KS_SSXX"]].push(csvLineStr);
             }
-            if (!allDataInFile[currData["ks_ssxx"]]) {
-                allDataInFile[currData["ks_ssxx"]] = [];
+            if (!allDataInFile[currData["KS_SSXX"]]) {
+                allDataInFile[currData["KS_SSXX"]] = [];
             }
-            allDataInFile[currData["ks_ssxx"]].push(currData);
+            allDataInFile[currData["KS_SSXX"]].push(currData);
         }
     });
     // 读取完成后
@@ -799,9 +811,9 @@ function analyticHandle(file, inputEl) {
         for (let key in allDataInFile) {
             let listData = allDataInFile[key];
             let currData = listData[0];
-            let bmxq = currData["ks_bmxq"];//校区代码
-            let yyjb = currData["ks_yyjb"];//语言级别
-            let dm_mc = currData["dm_mc"];//学校名称
+            let bmxq = currData["KS_BMXQ"];//校区代码
+            let yyjb = currData["KS_YYJB"];//语言级别
+            let dm_mc = currData["DM_MC"];//学校名称
 
             // 【生成的文件 *.pak.txt 字段】
             // no    num  ks_ssxx ks_bmxq ks_yyjb count ks_zsh ks_zsh dm_mc
@@ -821,8 +833,8 @@ function analyticHandle(file, inputEl) {
                 row.push(bmxq);
                 row.push(yyjb);
                 row.push(500);
-                let firstNum = parseInt(listData[(pakNo - 1) * 500]["ks_zsh"]);//当前组的第一个
-                let lastNum = parseInt(listData[pakNo * 500 - 1]["ks_zsh"]);//当前组的最后一个
+                let firstNum = parseInt(listData[(pakNo - 1) * 500]["KS_ZSH"]);//当前组的第一个
+                let lastNum = parseInt(listData[pakNo * 500 - 1]["KS_ZSH"]);//当前组的最后一个
                 row.push(firstNum);
                 row.push(lastNum);
                 row.push(dm_mc);
@@ -837,8 +849,8 @@ function analyticHandle(file, inputEl) {
                 row.push(bmxq);
                 row.push(yyjb);
                 row.push(pakSizeMod);
-                let firstNum = parseInt(listData[pakSize * 500]["ks_zsh"]);//当前组的第一个
-                let lastNum = parseInt(listData[listData.length - 1]["ks_zsh"]);//当前组的最后一个
+                let firstNum = parseInt(listData[pakSize * 500]["KS_ZSH"]);//当前组的第一个
+                let lastNum = parseInt(listData[listData.length - 1]["KS_ZSH"]);//当前组的最后一个
                 row.push(firstNum);//当前组的第一个
                 row.push(lastNum);//当前组的最后一个
                 row.push(dm_mc);
@@ -847,10 +859,10 @@ function analyticHandle(file, inputEl) {
             }
 
 
-            //按院系名称[ks_xy_dm]校区代码[ks_bmxq]分组
+            //按院系名称[KS_XY_DM]校区代码[KS_BMXQ]分组
             let yxGroup = {};
             listData.forEach(currData => {
-                let nkey = currData["ks_xy_dm"] + "-" + (currData["ks_bmxq"] == "" ? "0" : currData["ks_bmxq"]);
+                let nkey = (currData["KS_XY_DM"] ? currData["KS_XY_DM"] : currData["KS_XY"] ? currData["KS_XY"] : "--") + "-" + (currData["KS_BMXQ"] == "" ? "0" : currData["KS_BMXQ"]);
                 if (!yxGroup[nkey]) {
                     yxGroup[nkey] = [];
                 }
@@ -866,11 +878,11 @@ function analyticHandle(file, inputEl) {
                 row.push(xy_dm);
                 row.push(dm_mc);
                 row.push(yxList.length);
-                let firstNum = parseInt(yxList[0]["ks_zsh"]);
-                let lastNum = parseInt(yxList[yxList.length - 1]["ks_zsh"]);
+                let firstNum = parseInt(yxList[0]["KS_ZSH"]);
+                let lastNum = parseInt(yxList[yxList.length - 1]["KS_ZSH"]);
                 let pakNos = [];
                 // yxList.forEach(currData=>{
-                //     var zsh =  currData["ks_zsh"];
+                //     var zsh =  currData["KS_ZSH"];
                 //     pakInfoArr.forEach(pak=>{
                 //         if(pak.firstNum <= zsh && pak.lastNum >= zsh){
                 //             pakNos.push(pak.pakNum);
@@ -1170,7 +1182,7 @@ function chooseFile() {
                 columns.forEach(column => {
                     var c = column.replace(/["']/g, "").trim();
                     var size = (tableData.length + 1);
-                    tableData.push({ "说明": "字段" + size, "内容": c, "启用": false, "排序号": size, "照片": false, "二维码": false })
+                    tableData.push({ "说明": "字段" + size, "内容": c.toUpperCase(), "启用": false, "排序号": size, "照片": false, "二维码": false })
                 });
                 setTableData();
             }
@@ -1191,7 +1203,9 @@ function picChange() {
                     tableData[value]['照片'] = !this.checke;
                 }
             }
-            if (tableData[value]['照片'] != defaultTableData[value]['照片']) {
+            if (!defaultTableData[value]) {
+                g_data_changed = 2;
+            } else if (tableData[value]['照片'] != defaultTableData[value]['照片']) {
                 g_data_changed = 2;
             }
         } else {
@@ -1216,7 +1230,9 @@ function qrcodeChange() {
                     tableData[value]['二维码'] = !this.checke;
                 }
             }
-            if (tableData[value]['二维码'] != defaultTableData[value]['二维码']) {
+            if (!defaultTableData[value]) {
+                g_data_changed = 2;
+            } else if (tableData[value]['二维码'] != defaultTableData[value]['二维码']) {
                 g_data_changed = 2;
             }
         } else {
@@ -1265,9 +1281,10 @@ function splitFile() {
 function doSplitFile() {
     var files = document.querySelector("#splitFilesSelect").files;
     if (files.length > 0) {
+        layerLoadIdx = layer.load(1);
         var msg = [];
-        files.forEach(file => {
-            var name = file.name;
+        for (var j = 0; j < files.length; j++) {
+            var file = files[j];
             var fullpath = file.path;
             var extName = path.extname(fullpath);
             var fullpath_0 = fullpath.replace(extName, "");
@@ -1277,8 +1294,15 @@ function doSplitFile() {
             var sfLines = {};
             for (var i = 1; i < lines.length; i++) {
                 var line = lines[i].trim();
+                if (line.length == "") {
+                    continue;
+                }
                 var fields = line.split(",");
-                var sf = fields[2].substring(0, 2);
+                if (fields.length < 2) {
+                    console.info("无效行--->行号：" + i + ",内容：" + line);
+                    continue;
+                }
+                var sf = fields[2].replace("\"", "").substring(0, 2);
                 var arr = sfLines[sf];
                 if (!arr) {
                     arr = [headLine]
@@ -1288,11 +1312,13 @@ function doSplitFile() {
             }
             for (var sf in sfLines) {
                 var filepath_ = fullpath_0 + "_" + sf + extName;
-                msg.push("创建文件 " + filepath_);
+                msg.push("创建文件 " + path.basename(filepath_));
                 fs.writeFileSync(filepath_, sfLines[sf].join("\r\n"));
             }
-        });
+        };
+        layer.close(layerLoadIdx);
         alert(msg.join("<br/>"), "分隔文件处理完成");
+        $("#btnFindFile").click();
     }
     $("#splitFileBtn").removeClass("disabled").removeAttr("disabled");
 }
