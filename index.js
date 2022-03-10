@@ -833,11 +833,23 @@ function analyticHandle(file, inputEl) {
                 row.push(bmxq);
                 row.push(yyjb);
                 row.push(500);
-                let firstNum = parseInt(listData[(pakNo - 1) * 500]["KS_ZSH"]);//当前组的第一个
-                let lastNum = parseInt(listData[pakNo * 500 - 1]["KS_ZSH"]);//当前组的最后一个
+                let startIdx = (pakNo - 1) * 500;
+                let endIdx = pakNo * 500 ;
+                let currListData = listData[startIdx,endIdx];
+                let firstNum = parseInt(currListData[0]["KS_ZSH"]);//当前组的第一个
+                let lastNum = parseInt(currListData[currListData.length-1]["KS_ZSH"]);//当前组的最后一个
+                let yxmzList=[];
+                for(var i=0;i<currListData.length;i++){
+                    let ymxz_ = currListData[i]["KS_XY_DM"] ;
+                    if (!ymxz_){
+                        ymxz_ = currListData[i]["KS_XY"];
+                    }  
+                    yxmzList.push(ymxz_);
+                }
                 row.push(firstNum);
                 row.push(lastNum);
                 row.push(dm_mc);
+                row.push(yxmzList.join(" "));
                 pakInfoArr.push({ pakNum: pakNo, firstNum, lastNum });
                 fs.appendFileSync(pakFilepath, iconv.encode(row.join(",") + ("\r\n"), 'gbk'), "binary");
             }
@@ -849,11 +861,22 @@ function analyticHandle(file, inputEl) {
                 row.push(bmxq);
                 row.push(yyjb);
                 row.push(pakSizeMod);
-                let firstNum = parseInt(listData[pakSize * 500]["KS_ZSH"]);//当前组的第一个
-                let lastNum = parseInt(listData[listData.length - 1]["KS_ZSH"]);//当前组的最后一个
+                let startIdx = pakSize * 500;
+                let currListData = listData[startIdx];
+                let firstNum = parseInt(currListData[0]["KS_ZSH"]);//当前组的第一个
+                let lastNum = parseInt(currListData[currListData.length-1]["KS_ZSH"]);//当前组的最后一个
+                let yxmzList=[];
+                for(var i=0;i<currListData.length;i++){
+                    let ymxz_ = currListData[i]["KS_XY_DM"] ;
+                    if (!ymxz_){
+                        ymxz_ = currListData[i]["KS_XY"];
+                    }  
+                    yxmzList.push(ymxz_);
+                }
                 row.push(firstNum);//当前组的第一个
                 row.push(lastNum);//当前组的最后一个
                 row.push(dm_mc);
+                row.push(yxmzList.join(" "));
                 pakInfoArr.push({ pakNum: pakSize + 1, firstNum, lastNum });
                 fs.appendFileSync(pakFilepath, iconv.encode(row.join(",") + ("\r\n"), 'gbk'), "binary");
             }
