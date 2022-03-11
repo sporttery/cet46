@@ -835,7 +835,7 @@ function analyticHandle(file, inputEl) {
                 row.push(500);
                 let startIdx = (pakNo - 1) * 500;
                 let endIdx = pakNo * 500 ;
-                let currListData = listData[startIdx,endIdx];
+                let currListData = listData.slice(startIdx,endIdx);
                 let firstNum = parseInt(currListData[0]["KS_ZSH"]);//当前组的第一个
                 let lastNum = parseInt(currListData[currListData.length-1]["KS_ZSH"]);//当前组的最后一个
                 let yxmzList=[];
@@ -862,7 +862,7 @@ function analyticHandle(file, inputEl) {
                 row.push(yyjb);
                 row.push(pakSizeMod);
                 let startIdx = pakSize * 500;
-                let currListData = listData[startIdx];
+                let currListData = listData.slice(startIdx);
                 let firstNum = parseInt(currListData[0]["KS_ZSH"]);//当前组的第一个
                 let lastNum = parseInt(currListData[currListData.length-1]["KS_ZSH"]);//当前组的最后一个
                 let yxmzList=[];
