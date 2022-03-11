@@ -844,7 +844,8 @@ function analyticHandle(file, inputEl) {
                     if (!ymxz_){
                         ymxz_ = currListData[i]["KS_XY"];
                     }  
-                    yxmzList.push(ymxz_);
+                    if(!yxmzList.includes(ymxz_))
+                        yxmzList.push(ymxz_);
                 }
                 row.push(firstNum);
                 row.push(lastNum);
@@ -871,7 +872,8 @@ function analyticHandle(file, inputEl) {
                     if (!ymxz_){
                         ymxz_ = currListData[i]["KS_XY"];
                     }  
-                    yxmzList.push(ymxz_);
+                    if(!yxmzList.includes(ymxz_))
+                        yxmzList.push(ymxz_);
                 }
                 row.push(firstNum);//当前组的第一个
                 row.push(lastNum);//当前组的最后一个
