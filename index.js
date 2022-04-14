@@ -486,8 +486,8 @@ var checkDataFun = {
         // if (currData["KS_YYJB"] && _yyjb != currData["KS_YYJB"]) { //语言级别代码不一致
         //     err.push("语言级别代码不一致");
         // }
+        picFolder = path.join(folderArr[1], sf, _xxdm, _xqdm, _yyjb);
         if (picIndex != -1) {
-            picFolder = path.join(folderArr[1], sf, _xxdm, _xqdm, _yyjb);
             if (fs.existsSync(path.join(picFolder, currData["照片"] + ".jpg"))) {
                 currData["照片"] = path.join(sf, _xxdm, _xqdm, _yyjb, currData["照片"] + ".jpg");
             } else if (fs.existsSync(path.join(picFolder, currData["照片"] + ".png"))) {
@@ -495,16 +495,20 @@ var checkDataFun = {
             } else {
                 err.push("照片不存在 [" + path.join(picFolder, currData["照片"] + ".jpg") + "]");
             }
+        }else{
+            currData["照片"] = path.join(sf, _xxdm, _xqdm, _yyjb, currData["照片"] + ".jpg");
         }
+        picFolder = path.join(folderArr[2], sf, _xxdm, _xqdm, _yyjb);
         if (qrcodeIndex != -1) {
-            picFolder = path.join(folderArr[2], sf, _xxdm, _xqdm, _yyjb);
-            if (fs.existsSync(path.join(picFolder, currData["二维码"] + ".jpg"))) {
-                currData["二维码"] = path.join(sf, _xxdm, _xqdm, _yyjb, currData["二维码"] + ".jpg");
-            } else if (fs.existsSync(path.join(picFolder, currData["二维码"] + ".png"))) {
+            if (fs.existsSync(path.join(picFolder, currData["二维码"] + ".png"))) {
                 currData["二维码"] = path.join(sf, _xxdm, _xqdm, _yyjb, currData["二维码"] + ".png");
+            } else if (fs.existsSync(path.join(picFolder, currData["二维码"] + ".jpg"))) {
+                currData["二维码"] = path.join(sf, _xxdm, _xqdm, _yyjb, currData["二维码"] + ".jpg");
             } else {
                 err.push("二维码不存在 [" + path.join(picFolder, currData["二维码"] + ".jpg") + "]");
             }
+        }else{
+            currData["二维码"] = path.join(sf, _xxdm, _xqdm, _yyjb, currData["二维码"] + ".png");
         }
         if (currData["KS_ZKZ_XS"]) {
             if (currData["KS_ZKZ_XS"].length == 15) {
@@ -766,14 +770,14 @@ function analyticHandle(file, inputEl) {
                     allOkStrInFile[kddm][ks_ssxx]=[];
                 }
                 allOkStrInFile[kddm][ks_ssxx].push(csvLineStr);
+                if (!allDataInFile[kddm]) {
+                    allDataInFile[kddm] = {};
+                }
+                if(!allDataInFile[kddm][ks_ssxx]){
+                    allDataInFile[kddm][ks_ssxx]=[];
+                }
+                allDataInFile[kddm][ks_ssxx].push(currData);
             }
-            if (!allDataInFile[kddm]) {
-                allDataInFile[kddm] = {};
-            }
-            if(!allDataInFile[kddm][ks_ssxx]){
-                allDataInFile[kddm][ks_ssxx]=[];
-            }
-            allDataInFile[kddm][ks_ssxx].push(currData);
         }
     });
     // 读取完成后
@@ -793,12 +797,39 @@ function analyticHandle(file, inputEl) {
         //输出统计表格
 
         let tables = [];
-        for (let kddm in allOkStrInFile) {
-            
-            for(let ssxx in allOkStrInFile[kddm]){
+        for (let kddm /*考点名称*/ in allOkStrInFile) {            
+            for(let ssxx  /*学校代码*/ in allOkStrInFile[kddm]){
                 //打印矩阵数据，每4个一组
                 let tmpArr = [[], [], [], []];
                 let list = allOkStrInFile[kddm][ssxx];
+                //"KS_ZSH","KS_BMH","KS_ZKZ","KS_ZKZ_XS","KS_XM","KS_SFZ","KS_YYJB","KS_YYJBMC","KS_SSXX","DM_MC","KS_BMXQ","KS_XY"
+                list.sort((a,b)=>{
+                    tmpA = a.split("\",\"");
+                    tmpB = b.split("\",\"");
+                    DM_MC_IDX= 9;//DM_MC 名称
+                    KS_BMXQ_IDX=10; //KS_BMXQ 报名校区
+                    KS_XY_IDX=11;//院系名称
+                    KS_ZSH_IDX=1;//证书编号 
+                    if(tmpA[KS_BMXQ_IDX] >tmpB[KS_BMXQ_IDX]){
+                        return 1;
+                    }else if(tmpA[KS_BMXQ_IDX] < tmpB[KS_BMXQ_IDX]){
+                        return -1;
+                    }else if(tmpA[DM_MC_IDX] > tmpB[DM_MC_IDX]){
+                        return 1;
+                    }else if(tmpA[DM_MC_IDX] < tmpB[DM_MC_IDX]){
+                        return -1;
+                    }else if(tmpA[KS_XY_IDX] > tmpB[KS_XY_IDX]){
+                        return 1;
+                    }else if(tmpA[KS_XY_IDX] < tmpB[KS_XY_IDX]){
+                        return -1;
+                    }else if(tmpA[KS_ZSH_IDX] > tmpB[KS_ZSH_IDX]){
+                        return 1;
+                    }else if(tmpA[KS_ZSH_IDX] < tmpB[KS_ZSH_IDX]){
+                        return -1;
+                    }else {
+                        return 0;
+                    }
+                })
                 let size = Math.floor(list.length / tmpArr.length);
                 let mod = list.length % tmpArr.length;
                 let sizeArr = [size, size, size, size];
@@ -844,6 +875,14 @@ function analyticHandle(file, inputEl) {
                         return 1;
                     }else if(a["DM_MC"] < b["DM_MC"]){
                         return -1;
+                    }else if(a["KS_XY"] > b["KS_XY"]){
+                        return 1;
+                    }else if(a["KS_XY"] < b["KS_XY"]){
+                        return -1;
+                    }else if(a["KS_ZSH"] > b["KS_ZSH"]){
+                        return 1;
+                    }else if(a["KS_ZSH"] < b["KS_ZSH"]){
+                        return -1;
                     }else {
                         return 0;
                     }
@@ -854,20 +893,26 @@ function analyticHandle(file, inputEl) {
                 let bmxq = currData["KS_BMXQ"];//校区代码
                 let yyjb = currData["KS_YYJB"];//语言级别
                 let dm_mc = currData["DM_MC"];//学校名称
+
+                var ks_bmh = currData["KS_BMH"];
+                var _sf = ks_bmh.substring(0,2); //省份
+                var _xxdm = ks_bmh.substring(0, 5);//学校代码
+                var _xqdm = ks_bmh[5];//校区代码
+                var _yyjb = ks_bmh[6];//语言级别
     
                 // 【生成的文件 *.pak.txt 字段】
-                // no    num  ks_ssxx ks_bmxq ks_yyjb count ks_zsh ks_zsh dm_mc
+                // no    num  ks_ssxx ks_bmxq ks_yyjb count ks_zsh ks_zsh dm_mc,省份代码
                 // 条码,包号,学校代码,校区代码,语言级别,证书数量,起始证书编号,终止证书编号,学校名称
                 //每包500个
     
                 let pakSize = Math.floor(listData.length / 500);
                 let pakSizeMod = listData.length % 500;
-                let orderNum = parseInt(kddm) + oNum1++*1000 + oNum2++*100 + oNum3++*10;
+                let orderNum = sf + ""+_xxdm+""+_xqdm+""+_yyjb;
     
-                let pakInfoArr = [];
+                let pakInfoData = {};
                 for (let pakNo = 1; pakNo <= pakSize; pakNo++) {
                     let row = [];
-                    row.push(orderNum + pakNo);
+                    row.push(orderNum + (100+ pakNo));
                     row.push(pakNo);
                     row.push(kddm);
                     row.push(bmxq);
@@ -878,7 +923,7 @@ function analyticHandle(file, inputEl) {
                     let currListData = listData.slice(startIdx,endIdx);
                     let firstNum = parseInt(currListData[0]["KS_ZSH"]);//当前组的第一个
                     let lastNum = parseInt(currListData[currListData.length-1]["KS_ZSH"]);//当前组的最后一个
-                    let yxmzList="";
+                    let yxmzList="";//院系名称拼在一起
                     for(var i=0,j=1;i<currListData.length;i++){
                         let ymxz_ = currListData[i]["KS_XY_DM"] ;
                         if (!ymxz_){
@@ -887,17 +932,19 @@ function analyticHandle(file, inputEl) {
                         if(yxmzList.indexOf(ymxz_)==-1){
                             yxmzList += j++ +"、"+ymxz_ + "    "
                         }
+                        pakInfoData["_"+currListData[i]["KS_ZSH"]] = pakNo;
                     }
                     row.push(firstNum);
                     row.push(lastNum);
                     row.push(dm_mc);
                     row.push(yxmzList);
-                    pakInfoArr.push({ pakNum: pakNo, firstNum, lastNum });
+                    row.push(sf);
+                    
                     fs.appendFileSync(pakFilepath, iconv.encode(row.join(",") + ("\r\n"), 'gbk'), "binary");
                 }
                 if (pakSizeMod > 0) {
                     let row = [];
-                    row.push(orderNum + (pakSize+2));
+                    row.push(orderNum + (pakSize+2+100));
                     row.push(pakSize + 1);
                     row.push(kddm);
                     row.push(bmxq);
@@ -907,7 +954,7 @@ function analyticHandle(file, inputEl) {
                     let currListData = listData.slice(startIdx);
                     let firstNum = parseInt(currListData[0]["KS_ZSH"]);//当前组的第一个
                     let lastNum = parseInt(currListData[currListData.length-1]["KS_ZSH"]);//当前组的最后一个
-                    let yxmzList="";
+                    let yxmzList="";//院系名称拼在一起
                     for(var i=0,j=1;i<currListData.length;i++){
                         let ymxz_ = currListData[i]["KS_XY_DM"] ;
                         if (!ymxz_){
@@ -916,54 +963,54 @@ function analyticHandle(file, inputEl) {
                         if(yxmzList.indexOf(ymxz_)==-1){
                             yxmzList += j++ +"、"+ymxz_ + "    "
                         }
+                        pakInfoData["_"+currListData[i]["KS_ZSH"]] = pakSize + 1;
                     }
                     row.push(firstNum);
                     row.push(lastNum);
                     row.push(dm_mc);
                     row.push(yxmzList);
-                    pakInfoArr.push({ pakNum: pakSize + 1, firstNum, lastNum });
+                    row.push(sf);
                     fs.appendFileSync(pakFilepath, iconv.encode(row.join(",") + ("\r\n"), 'gbk'), "binary");
                 }
     
     
                 //按院系名称[KS_XY_DM]校区代码[KS_BMXQ]分组
                 let yxGroup = {};
+                let pakGroup = {};
                 listData.forEach(currData => {
                     let nkey = (currData["KS_XY_DM"] ? currData["KS_XY_DM"] : currData["KS_XY"] ? currData["KS_XY"] : "--") + "-" + (currData["KS_BMXQ"] == "" ? "0" : currData["KS_BMXQ"]);
                     if (!yxGroup[nkey]) {
                         yxGroup[nkey] = [];
                     }
+                    if (!pakGroup[nkey]) {
+                        pakGroup[nkey] = [];
+                    }
+                    var zsh =  currData["KS_ZSH"];
+                    var pakNo = pakInfoData["_"+zsh];
                     yxGroup[nkey].push(currData);
+                    if(pakGroup[nkey].indexOf(pakNo)==-1){
+                        pakGroup[nkey].push(parseInt(pakNo));
+                    }
                 });
                 let rows = [];
                 for (let dm in yxGroup) {
                     let xy_dm = dm.split("-")[0];
                     bmxq = dm.split("-")[1];
                     let yxList = yxGroup[dm];
+                    let pakNos = pakGroup[dm];
+                    if(pakNos.length==1){
+                        pakNos.push(pakNos[0]);
+                    }else{
+                        pakNos.sort((a,b)=>{return a-b});
+                    }
                     row = [];
                     row.push(bmxq);
                     row.push(xy_dm);
                     row.push(dm_mc);
                     row.push(yxList.length);
                     let firstNum = parseInt(yxList[0]["KS_ZSH"]);
-                    let lastNum = parseInt(yxList[yxList.length - 1]["KS_ZSH"]);
-                    let pakNos = [];
-                    // yxList.forEach(currData=>{
-                    //     var zsh =  currData["KS_ZSH"];
-                    //     pakInfoArr.forEach(pak=>{
-                    //         if(pak.firstNum <= zsh && pak.lastNum >= zsh){
-                    //             pakNos.push(pak.pakNum);
-                    //         }
-                    //     })
-                    // });
-                    pakInfoArr.forEach(pak => {
-                        if (pak.firstNum <= firstNum && pak.lastNum >= firstNum) {
-                            pakNos.push(pak.pakNum);
-                        }
-                        if (pak.firstNum <= lastNum && pak.lastNum >= lastNum) {
-                            pakNos.push(pak.pakNum);
-                        }
-                    })
+                    let lastNum = parseInt(yxList[yxList.length - 1]["KS_ZSH"]);                   
+                    
                     row.push(pakNos.join("-"));
                     row.push(firstNum + "-" + lastNum);
                     rows.push(row);
