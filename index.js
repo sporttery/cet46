@@ -809,7 +809,9 @@ function analyticHandle(file, inputEl) {
                     DM_MC_IDX= 9;//DM_MC 名称
                     KS_BMXQ_IDX=10; //KS_BMXQ 报名校区
                     KS_XY_IDX=11;//院系名称
-                    KS_ZSH_IDX=1;//证书编号 
+                    KS_ZSH_IDX=0;//证书编号 
+                    var zsh_a = parseInt(tmpA[KS_ZSH_IDX].replace(/\D/g,""))
+                    var zsh_b = parseInt(tmpB[KS_ZSH_IDX].replace(/\D/g,""))
                     if(tmpA[KS_BMXQ_IDX] >tmpB[KS_BMXQ_IDX]){
                         return 1;
                     }else if(tmpA[KS_BMXQ_IDX] < tmpB[KS_BMXQ_IDX]){
@@ -822,12 +824,8 @@ function analyticHandle(file, inputEl) {
                         return 1;
                     }else if(tmpA[KS_XY_IDX] < tmpB[KS_XY_IDX]){
                         return -1;
-                    }else if(tmpA[KS_ZSH_IDX] > tmpB[KS_ZSH_IDX]){
-                        return 1;
-                    }else if(tmpA[KS_ZSH_IDX] < tmpB[KS_ZSH_IDX]){
-                        return -1;
                     }else {
-                        return 0;
+                        return zsh_a - zsh_b;
                     }
                 })
                 let size = Math.floor(list.length / tmpArr.length);
@@ -867,6 +865,8 @@ function analyticHandle(file, inputEl) {
                 let oNum3=0;
                 let listData = allDataInFile[kddm][ssxx];
                 listData.sort((a,b)=>{
+                    var zsh_a = parseInt(a["KS_ZSH"])
+                    var zsh_b = parseInt(b["KS_ZSH"])
                     if(a["KS_BMXQ"] > b["KS_BMXQ"]){
                         return 1;
                     }else if(a["KS_BMXQ"] < b["KS_BMXQ"]){
@@ -879,12 +879,8 @@ function analyticHandle(file, inputEl) {
                         return 1;
                     }else if(a["KS_XY"] < b["KS_XY"]){
                         return -1;
-                    }else if(a["KS_ZSH"] > b["KS_ZSH"]){
-                        return 1;
-                    }else if(a["KS_ZSH"] < b["KS_ZSH"]){
-                        return -1;
-                    }else {
-                        return 0;
+                    }else  {
+                        return zsh_a - zsh_b;
                     }
                 })
 
@@ -928,9 +924,10 @@ function analyticHandle(file, inputEl) {
                         let ymxz_ = currListData[i]["KS_XY_DM"] ;
                         if (!ymxz_){
                             ymxz_ = currListData[i]["KS_XY"];
-                        }  
-                        if(yxmzList.indexOf(ymxz_)==-1){
-                            yxmzList += j++ +"、"+ymxz_ + "    "
+                        } 
+                        var name = "、"+ymxz_ + "    ";
+                        if(yxmzList.indexOf(name)==-1){
+                            yxmzList += j++ +name
                         }
                         pakInfoData["_"+currListData[i]["KS_ZSH"]] = pakNo;
                     }
@@ -960,9 +957,11 @@ function analyticHandle(file, inputEl) {
                         if (!ymxz_){
                             ymxz_ = currListData[i]["KS_XY"];
                         }  
-                        if(yxmzList.indexOf(ymxz_)==-1){
-                            yxmzList += j++ +"、"+ymxz_ + "    "
+                        var name = "、"+ymxz_ + "    ";
+                        if(yxmzList.indexOf(name)==-1){
+                            yxmzList += j++ +name
                         }
+                        
                         pakInfoData["_"+currListData[i]["KS_ZSH"]] = pakSize + 1;
                     }
                     row.push(firstNum);
