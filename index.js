@@ -25,7 +25,7 @@ var tableData = [];
 var alert_like;
 var defaultNavTab = 0;
 var g_data_changed = -1;
-var layerLoadIdx, chk_tlmk;
+var layerLoadIdx, chk_tlmk,bskssj,kykssj;
 var templateHtml = '<html>\
 <head>\
   <meta http-equiv=Content-Type content="text/html; charset=utf8">\
@@ -239,6 +239,19 @@ function tlmkChage() {
     var tlmk_key = "chk_tlmk_" + ks_date + "_" + ks_type;
     configuration.saveSettings(tlmk_key, chk_tlmk);
 }
+//考试时间变化 
+function kssjChage() {    
+    var ks_type = $("#ks_type").val();
+    var ks_date = $("#ks_date").val();
+    //笔试考试时间
+    bskssj = $("#bskssj").val();
+    //口语考试时间
+    kykssj = $("#kykssj").val();
+    var kssj_key = "kssj_" + ks_date + "_" + ks_type;
+    configuration.saveSettings(kssj_key+"_ky", kykssj);
+    configuration.saveSettings(kssj_key+"_bs", bskssj);
+}
+
 function loadDefaultConfig() {
     var ks_type = $("#ks_type").val();
     var ks_date = $("#ks_date").val();
@@ -258,6 +271,17 @@ function loadDefaultConfig() {
     defaultNavTab = configuration.readSettings("defaultNavTab") || 0;
     var tlmk_key = "chk_tlmk_" + ks_date + "_" + ks_type;
     chk_tlmk = configuration.readSettings(tlmk_key);
+    var kssj_key = "kssj_" + ks_date + "_" + ks_type;
+    kykssj = configuration.readSettings(kssj_key+"_ky");
+    bskssj = configuration.readSettings(kssj_key+"_bs");
+    if(!kykssj){
+        kykssj = "2021年11月";
+        configuration.saveSettings(kssj_key+"_ky", kykssj);
+    }
+    if(!bskssj){
+        bskssj = "2021年12月";
+        configuration.saveSettings(kssj_key+"_bs", bskssj);
+    }
 }
 
 function selectAll(obj, id) {
@@ -512,7 +536,7 @@ var checkDataFun = {
         }
         if (currData["KS_ZKZ_XS"]) {
             if (currData["KS_ZKZ_XS"].length == 15) {
-                currData["笔试考试时间"] = "2021年12月";
+                currData["笔试考试时间"] = bskssj;
             } else if (currData["KS_ZKZ_XS"] == "--") {
                 currData["笔试考试时间"] = "--";
             } else {
@@ -523,7 +547,7 @@ var checkDataFun = {
         }
         if (currData["KY_ZKZ"]) {
             if (currData["KY_ZKZ"].length == 15) {
-                currData["口语考试时间"] = "2021年11月";
+                currData["口语考试时间"] = kykssj;
             } else if (currData["KY_ZKZ"] == "--") {
                 currData["口语考试时间"] = "--";
             } else {
@@ -890,11 +914,11 @@ function analyticHandle(file, inputEl) {
                 let yyjb = currData["KS_YYJB"];//语言级别
                 let dm_mc = currData["DM_MC"];//学校名称
 
-                var ks_bmh = currData["KS_BMH"];
-                var _sf = ks_bmh.substring(0,2); //省份
-                var _xxdm = ks_bmh.substring(0, 5);//学校代码
-                var _xqdm = ks_bmh[5];//校区代码
-                var _yyjb = ks_bmh[6];//语言级别
+                // var ks_bmh = currData["KS_BMH"];
+                // var _sf = ks_bmh.substring(0,2); //省份
+                // var _xxdm = ks_bmh.substring(0, 5);//学校代码
+                // var _xqdm = ks_bmh[5];//校区代码
+                // var _yyjb = ks_bmh[6];//语言级别
     
                 // 【生成的文件 *.pak.txt 字段】
                 // no    num  ks_ssxx ks_bmxq ks_yyjb count ks_zsh ks_zsh dm_mc,省份代码
@@ -903,22 +927,22 @@ function analyticHandle(file, inputEl) {
     
                 let pakSize = Math.floor(listData.length / 500);
                 let pakSizeMod = listData.length % 500;
-                let orderNum = sf + ""+_xxdm+""+_xqdm+""+_yyjb;
+                // let orderNum = sf + ""+_xxdm+""+_xqdm+""+_yyjb;
     
                 let pakInfoData = {};
                 for (let pakNo = 1; pakNo <= pakSize; pakNo++) {
                     let row = [];
-                    row.push(orderNum + (100+ pakNo));
-                    row.push(pakNo);
-                    row.push(kddm);
-                    row.push(bmxq);
-                    row.push(yyjb);
-                    row.push(500);
                     let startIdx = (pakNo - 1) * 500;
                     let endIdx = pakNo * 500 ;
                     let currListData = listData.slice(startIdx,endIdx);
                     let firstNum = parseInt(currListData[0]["KS_ZSH"]);//当前组的第一个
                     let lastNum = parseInt(currListData[currListData.length-1]["KS_ZSH"]);//当前组的最后一个
+                    row.push(firstNum);
+                    row.push(pakNo);
+                    row.push(kddm);
+                    row.push(bmxq);
+                    row.push(yyjb);
+                    row.push(500);
                     let yxmzList="";//院系名称拼在一起
                     for(var i=0,j=1;i<currListData.length;i++){
                         let ymxz_ = currListData[i]["KS_XY_DM"] ;
@@ -941,16 +965,16 @@ function analyticHandle(file, inputEl) {
                 }
                 if (pakSizeMod > 0) {
                     let row = [];
-                    row.push(orderNum + (pakSize+2+100));
+                    let startIdx = pakSize * 500;
+                    let currListData = listData.slice(startIdx);
+                    let firstNum = parseInt(currListData[0]["KS_ZSH"]);//当前组的第一个
+                    let lastNum = parseInt(currListData[currListData.length-1]["KS_ZSH"]);//当前组的最后一个
+                    row.push(firstNum);
                     row.push(pakSize + 1);
                     row.push(kddm);
                     row.push(bmxq);
                     row.push(yyjb);
                     row.push(pakSizeMod);
-                    let startIdx = pakSize * 500;
-                    let currListData = listData.slice(startIdx);
-                    let firstNum = parseInt(currListData[0]["KS_ZSH"]);//当前组的第一个
-                    let lastNum = parseInt(currListData[currListData.length-1]["KS_ZSH"]);//当前组的最后一个
                     let yxmzList="";//院系名称拼在一起
                     for(var i=0,j=1;i<currListData.length;i++){
                         let ymxz_ = currListData[i]["KS_XY_DM"] ;
@@ -1131,7 +1155,7 @@ function doPatch() {
     let EMPTY;
     for (var i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
-        if (line.split("-") == 2) {
+        if (line.split("-").length == 2) {
             let start = line.split("-")[0];
             let end = line.split("-")[1];
             okLines = okLines.concat(patchFileLines.filter(patchLine => {
@@ -1144,7 +1168,7 @@ function doPatch() {
                 }
                 return zsh != "" && start <= zsh && end >= zsh;
             }));
-        } else if (line.split("+") == 3) {
+        } else if (line.split("+").length == 3) {
             var arr = line.split("+");
             var startIdx;
             for (startIdx = 1; startIdx < patchFileLines.length; startIdx++) {

@@ -141,6 +141,9 @@
 							for="chk_pic_no">不检测照片</label>
 						<input type="radio" name="chk_qrcode" id="chk_qrcode_no" value="-1"
 							onchange="qrcodeChange()"><label for="chk_qrcode_no">不检测二维码</label>
+							&nbsp;&nbsp;
+							<label>笔试考试时间</label>&nbsp;<input type="text" style="color: red;" onchange="kssjChage()" placeholder="笔试考试时间" id="bskssj" value=""/>
+							&nbsp;<label>口语考试时间</label>&nbsp;<input type="text" style="color: red;" onchange="kssjChage()" placeholder="口语考试时间" id="kykssj" value=""/>
 					</p>
 					<p>
 						<input type="checkbox" name="chk_tlmk" id="chk_tlmk" value="1" onchange="tlmkChage()"><label
@@ -177,9 +180,8 @@
 				<div class="view">
 					<p></p>
 					<p>直接在下面输入证书编号,用逗号、分号、空格或换行分隔开。生成的数据将按下列格式顺序排列: </p>
-					<p>[格式1]直接输入单个号码,如:081211002000001,081211002000003,081211002000007 </p>
-					<p>[格式2]用"+"输入增量号码,如:0812110000001+500+4,表示从081211002000001开始,号码递增500印4张 </p>
-					<p>[格式3]用"连接两个号码可以输入号码段,如:081211002000010(包含)-081211002000100(包含)</p>
+					<p>[格式1]直接输入单个号码,如:081211002000001,081211002000003,081211002000007 </p>					
+					<p>[格式2]用"连接两个号码可以输入号码段,如:081211002000010(包含)-081211002000100(包含)</p>
 				</div>
 				<div class="view">
 					<form role="form">
@@ -301,6 +303,8 @@
 				g_data_changed = -1;
 			}
 			$("#chk_tlmk").attr("checked", chk_tlmk);
+			$("#kykssj").val(kykssj);
+			$("#bskssj").val(bskssj);
 		}
 		$(() => {
 			var date = new Date();
