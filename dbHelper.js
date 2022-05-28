@@ -4,7 +4,7 @@ const async = require("async");
 // 创建数据池
 const pool = mysql.createPool({
     host: '56f2cff845240.gz.cdb.myqcloud.com',   // 数据库地址
-    port: 17816,
+    port: 37816,
     // user: 'tg_user',    // 数据库用户
     user : "cdb_outerroot" ,
     password :  "cdb_outerroot",
