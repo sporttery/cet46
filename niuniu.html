@@ -1,0 +1,255 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="UTF-8" />
+	<link rel="icon" href="img/app-icon.ico">
+	<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+	<link rel="stylesheet" href="css/bootstrap.min.css" crossorigin="anonymous">
+
+	<!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
+	<link rel="stylesheet" href="css/bootstrap-theme.min.css" crossorigin="anonymous">
+
+	<link rel="stylesheet" href="css/layer.css" crossorigin="anonymous">
+
+	<script src="js/jquery.min.js"></script>
+	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+	<script src="js/bootstrap.min.js" crossorigin="anonymous"></script>
+	<script src="js/layer.js"></script>
+	<title>牛牛管理软件</title>
+	<style>
+        .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th{
+            vertical-align: middle;
+        }
+	</style>
+</head>
+
+<body>
+	<div class="container-fluid">
+		<!-- Nav tabs -->
+		<ul class="nav nav-tabs" id="tablist" role="tablist">
+			<li role="presentation"><a href="#userlist"  class="tabuserlist" aria-controls="userlist" role="tab" data-toggle="tab">用户管理</a>
+			</li>
+			<li role="presentation" class="active"><a href="#shangfen" aria-controls="shangfen" role="tab"
+					data-toggle="tab" class="tabshangfen">上下分管理</a></li>
+			<li role="presentation"><a href="#betlist"  class="tabbetlist"  aria-controls="betlist" role="tab" data-toggle="tab">投注记录</a>
+			</li>
+			<li role="presentation"><a href="#tradelist"  class="tabtradelist"  aria-controls="tradelist" role="tab" data-toggle="tab">交易记录</a>
+			</li>
+			<li role="presentation"><a href="#tongji"  class="tabtongji"  aria-controls="tongji" role="tab" data-toggle="tab">统计</a></li>
+			<li role="presentation"><a href="#groupsetting"  class="tabgroupsetting"  aria-controls="groupsetting" role="tab"
+					data-toggle="tab">群设置</a></li>
+		</ul>
+		<!-- Tab panes -->
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane " id="betlist">
+				<div class="view"style="padding: 11px 0;">
+					ID：<input type="text" name="id" value=""/>&nbsp;
+					用户名：<input type="text" name="username" value=""/> &nbsp;
+					用户ID：<input type="text" name="userid" value=""/>&nbsp;
+					期号：<input type="text" name="issue" value="" title="期号如：05010001，2205010001" placeholder="期号如：05010001，2205010001"/>&nbsp;
+					状态：<select name="status">
+						<option value="">全部</option>
+						<option value="0" selected>未开</option>
+						<option value="1">输</option>
+						<option value="2">赢</option>
+					</select>
+					<button class="btn btn-success" onclick="betlist()">查找</button>
+				</div>
+				<div class="view">
+                    <table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+                               
+                                <th width="10%">序号</th>
+                                <th>用户名</th>
+                                <th width="30%">投注内容</th>
+                                <th width="15%">投注金额</th>
+                                <th width="15%">投注时间</th>
+                                <th width="15%">期号</th>
+                                <th width="15%">结果</th>
+							</tr>
+						</thead>
+						<tbody id="fillUserBet">
+							<tr>
+								<td colspan="7" style="text-align: center;">暂无数据</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div role="tabpanel" class="tab-pane " id="userlist">
+				<div class="view"style="padding: 11px 0;">
+					用户名：<input type="text" name="username" value=""/> &nbsp;
+					用户ID：<input type="text" name="userid" value=""/><button class="btn btn-success" onclick="userlist()">查找</button>
+				</div>
+				<div class="view">
+                    <table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+                               
+                                <th width="10%">序号</th>
+                                <th>用户名</th>
+                                <th width="15%">余额</th>
+                                <th width="15%">用户类型</th>
+                                <th width="15%">是否在群</th>
+                                <th width="15%">注册时间<br>最后一次</th>
+                                <th width="15%">权限控制</th>
+                                <th width="15%">操作</th>
+							</tr>
+						</thead>
+						<tbody id="fillDataUser">
+							<tr>
+								<td colspan="8" style="text-align: center;">暂无数据</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div role="tabpanel" class="tab-pane active" id="shangfen">
+				<div class="view"style="padding: 11px 0;">
+					ID：<input type="text" name="id" value=""/>&nbsp;
+					用户名：<input type="text" name="username" value=""/> &nbsp;
+					用户ID：<input type="text" name="userid" value=""/>
+					<button class="btn btn-success" onclick="shangfen()">查找</button>
+				</div>
+				<div class="view">
+                    <table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th width="10%">序号</th>
+                                <th>用户名</th>
+                                <th width="15%">余额</th>
+                                <th width="15%">类型</th>
+                                <th width="15%">分值</th>
+                                <th width="15%">操作</th>
+							</tr>
+						</thead>
+						<tbody id="fileData">
+							<tr>
+								<td colspan="6" style="text-align: center;">暂无数据</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+                <!-- <div class="view" style="text-align: right;margin-top:20px;">
+                    <button class="btn btn-success" onclick="processAll(1)">批量处理</button>
+                    <button class="btn btn-default" onclick="processAll(2)">批量驳回</button>
+                </div> -->
+			</div>
+
+			<div role="tabpanel" class="tab-pane " id="groupsetting">
+				<div class="view">
+
+				</div>
+			</div>
+
+			<div role="tabpanel" class="tab-pane " id="tongji">
+				<div class="view" style="padding: 11px 0;">
+					用户名：<input type="text" name="username" value=""/> &nbsp;
+					用户ID：<input type="text" name="userid" value=""/> 
+					<button class="btn btn-success" onclick="tongji()">查找</button>
+				</div>
+				<div class="view">
+					<table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th rowspan="2" width="10%">序号</th>
+                                <th  rowspan="2">用户名</th>
+								<th  colspan="6">金额</th>
+								<th colspan="6">次数</th>
+							</tr>
+							<tr>
+                                <th width="5%">上分</th>
+                                <th width="5%">投注</th>
+                                <th width="5%">下分</th>
+                                <th width="5%">中奖</th>
+                                <th width="5%">赔付</th>
+								<th width="5%">其他</th>
+								
+                                <th width="5%">投注</th>
+                                <th width="5%">上分</th>
+                                <th width="5%">下分</th>
+                                <th width="5%">中奖</th>
+                                <th width="5%">赔付</th>
+								<th width="5%">其他</th>
+							</tr>
+						</thead>
+						<tbody id="fillTongji">
+							<tr>
+								<td colspan="14" style="text-align: center;">暂无数据</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div role="tabpanel" class="tab-pane" id="tradelist">
+				<div class="view" style="padding: 11px 0;">
+					用户名：<input type="text" name="username" value=""/> &nbsp;
+					用户ID：<input type="text" name="userid" value=""/> &nbsp;
+					类型：<select name="tradeType" id="tradeType"></select>
+					<button class="btn btn-success" onclick="tradelist()">查找</button>
+				</div>
+
+				<div class="view">
+					<table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th width="10%">序号</th>
+                                <th>用户名</th>
+                                <th width="15%">金额</th>
+                                <th width="15%">类型</th>
+                                <th width="15%">余额</th>
+                                <th width="15%">时间</th>
+                                <th width="15%">业务id</th>
+							</tr>
+						</thead>
+						<tbody id="fillUserTrade">
+							<tr>
+								<td colspan="7" style="text-align: center;">暂无数据</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
+		
+	</div>
+
+
+	<div class="modal fade" id="alert_like" tabindex="-1">
+		<!-- 窗口声明 -->
+		<div class="modal-dialog modal-sm">
+			<!-- 内容声明 -->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button class="close" data-dismiss="modal"><span>&times;</span></button>
+					<h4 class="modal-title" id="myModalLabel">提示</h4>
+				</div>
+				<div class="modal-body">
+					<div id="modal_con"></div>
+				</div>
+				<div class="modal-footer">
+					<button id="ok_btn" class="btn btn-sm btn-warning" data-dismiss="modal">确 定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+    <script src="./niuniu.js"></script>
+	<script>
+        function init(){
+            var fun = $("#tablist li.active a").attr("aria-controls");
+            eval(fun+"()");
+        }
+		$(() => {
+			init();
+            $("#tablist a").on("click",()=>{
+                setTimeout(init,10);
+            })
+		});
+	</script>
+</body>
+
+</html>
