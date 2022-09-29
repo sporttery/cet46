@@ -1,7 +1,7 @@
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const url = require('url')
-
+var configuration = require('./configuration');
 // 保存窗口对象的全局引用, 如果不这样做, 当JavaScript对象被当做垃圾回收时，window窗口会自动关闭
 let win
 
@@ -11,6 +11,7 @@ function createWindow () {
 
   win.setMenu(null);
 
+  configuration.saveSettings("version",app.getVersion());
   // 加载项目的index.html文件.
   win.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
@@ -20,9 +21,9 @@ function createWindow () {
   }))
 
   // 打开开发工具.
-  win.webContents.openDevTools({
-    mode:'bottom'
-  })
+  // win.webContents.openDevTools({
+  //   mode:'bottom'
+  // })
 
   win.on('closed', (e) => {
     // 取消引用窗口对象, 如果你的应用程序支持多窗口，通常你会储存windows在数组中，这是删除相应元素的时候。

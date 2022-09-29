@@ -1,0 +1,64 @@
+<html>
+
+<head>
+  <meta http-equiv=Content-Type content="text/html; charset=gb2312">
+  <style>
+  <!--
+   /* Font Definitions */
+  @page Section1
+  	{size:11.0in 8.5in;
+  	margin:1.25in 1.0in 1.25in 1.0in;
+  	mso-header-margin:35.4pt;
+  	mso-footer-margin:35.4pt;
+  	mso-paper-source:0;}
+  div.Section1
+  	{page:Section1;}
+  -->
+  </style>
+  <style>
+    .title {font-family: "宋体"; font-size:12pt; font-weight:bold; text-align: center;}
+    .table {border-collapse: collapse; border: none;}
+    .header {font-size:18pt; font-weight:bold;}
+    div, td {font-size: 12pt;text-align: center;word-wrap:break-word;}
+    td {border:solid black 1.0pt;font-size:18pt; font-weight:bold;text-align: center;word-wrap:break-word;}
+  </style>
+</head>
+
+<body>
+
+<div class=Section1 style="mso-page-orientation:landscape;">
+<p class=title><font size=7><span id=nnpr>%PROV%</span> &nbsp;<span id=nnce>%CETX% &nbsp;</span>%XH%# &nbsp; 箱单</font></p>
+<table width=100% cellspacing=0 cellpadding=2 class=table border=1 style="table-layout:fixed;">
+  <thead>
+    <tr><td width=10% class=header>语种</td><td width=10% class=header>考点代码</td><td width=30% class=header>学校名称</td><td width=10% class=header>成绩单数量</td><td width=10% class=header>包数</td><td width=20% class=header>起始证书编号</td><td width=20% class=header>结束证书编号</td></tr>
+  </thead>
+<T:ROW>  <tr><td class="header"></td><td class="header">%XXDM%</td><td class="header">%XXMC%</td><td class="header">%CJDSL%</td><td>%BS%</td><td>%ZSBH1%</td><td>%ZSBH2%</td></tr></T:ROW>
+</table>
+</div>
+<div style="width:100%;text-align:right;margin-top:100px; display:none" class="header">共____________箱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+</body>
+<script>
+var arr='11 北京市　　12 天津市　　13 河北　　14 山西　　15 内蒙古　　21 辽宁　　22 吉林　　23 黑龙江　　31 上海市　　32 江苏　　33 浙江　　34 安徽　　35 福建　36 江西　　37 山东　　41 河南　　42 湖北　　43 湖南　　44 广东　　45 广西　　46 海南　　50 重庆市　　51 四川　　52 贵州　　53 云南　　54 西藏　61 陕西　　62 甘肃　　63 青海　　64 宁夏　　65 新疆　　71 台湾　　81 香港　　91 澳门'.split(/\s+/);
+ndata={}
+for(var i=0;i<arr.length;i+=2){
+	ndata[arr[i].substring(0,2)] = arr[i+1]
+}
+var nnpr = document.getElementById("nnpr");
+var nnprText = nnpr.innerText
+if(nnprText==""){//从文件名中获取
+var url = location.href;
+var arr = url.split(/[_.]/);
+nnprText=arr[arr.length-3]
+}
+if(ndata[nnprText]){
+	nnpr.innerText = ndata[nnprText]
+}
+var trs = document.getElementsByTagName("tr");
+var nnce =  document.getElementById("nnce");
+var yz = nnce.innerText;
+nnce.style.display='none'
+for(var i=1;i<trs.length;i++){
+	trs[i].children[0].innerText=yz
+}
+</script>
+</html>

@@ -16,7 +16,7 @@
 	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
 	<script src="js/bootstrap.min.js" crossorigin="anonymous"></script>
 	<script src="js/layer.js"></script>
-	<title>CET46数据分析软件-鸿博股份-V1.4</title>
+	<title>CET46数据分析软件-鸿博股份</title>
 	<style>
 		.folderTxt.form-control {
 			width: 95%;
@@ -307,6 +307,7 @@
 			$("#bskssj").val(bskssj);
 		}
 		$(() => {
+			document.title = document.title + "-V"+configuration.readSettings("version");
 			var date = new Date();
 			var year = date.getFullYear();
 			var options = [];
