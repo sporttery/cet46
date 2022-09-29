@@ -21,6 +21,15 @@
     "appId": "com.huanbo.cet46",
     "copyright": "huanbo",
     "productName": "CET46",
+    "files":[
+      "css/**",
+      "img/**",
+      "js/**",
+      "main.js",
+      "index.min.js",
+      "configuration.js",
+      "index.html"
+    ],
     "nsis": {
       "oneClick": false,
       "allowElevation": true,
